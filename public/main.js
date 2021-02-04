@@ -24,6 +24,11 @@ axesHelper();
 initCannon();
 initPointerLock();
 //additems();
+const cube=Cube.init();
+scene.add(cube);
+addStats();
+//camera.lookAt(cube);
+
 animate();
 
 function initThree(){
@@ -31,10 +36,7 @@ function initThree(){
     scene.fog = new THREE.Fog(0x000000, 0, 600);
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.x=10;
-    camera.position.y=10;
-    camera.position.z = 10;
-    camera.lookAt(new THREE.Vector3(10, 0, 0));
+    // camera.lookAt(new THREE.Vector3(10, 0, 0));
 
     renderer =new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -77,15 +79,11 @@ function initThree(){
     floor.receiveShadow = true
     scene.add(floor)
 
-    //controls = new OrbitControls(camera, renderer.domElement);
-    // controls = new PointerLockControlsCannon(camera);
-    // scene.add(controls.getObject());
-
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        render();
+        renderer.render(scene, camera);
     }, false);
 }
 
@@ -106,7 +104,7 @@ function initCannon(){
     solver.tolerance = 0.1
     world.solver = new CANNON.SplitSolver(solver)
 
-    world.gravity.set(0, -20, 0)
+    world.gravity.set(0, -50, 0)
 
     physicsMaterial = new CANNON.Material('physics')
     const physics_physics = new CANNON.ContactMaterial(physicsMaterial, physicsMaterial, {
@@ -122,7 +120,7 @@ function initCannon(){
     sphereShape = new CANNON.Sphere(radius)
     sphereBody = new CANNON.Body({ mass: 5, material: physicsMaterial })
     sphereBody.addShape(sphereShape)
-    sphereBody.position.set(0, 5, 0)
+    sphereBody.position.set(0, 1.3,3)
     sphereBody.linearDamping = 0.9
     world.addBody(sphereBody);
 
@@ -171,11 +169,13 @@ function additems(){
     const cubeRotation={
         speed:0.01
     }
+}
+
+function addStats(){
 
     const gui = new dat.GUI();
-    gui.add(cubeRotation, 'speed', 0.0, 0.3).onChange(function (e) {
-        this.speed = e;
-    });
+    const cam=gui.addFolder('Camera')
+    cam.add(camera.position, 'x').getValue();
 }
 
 function animate() {
@@ -185,9 +185,39 @@ function animate() {
     }
     // cube.rotation.x += cubeRotation.speed;
     // cube.rotation.y += 0.01;
-    //controls.update();
+    // controls.update();
+    cube.position.x=controls.cannonBody.position.x;
+    cube.position.z=controls.cannonBody.position.z;
+
     controls.update(Date.now() - time);
     renderer.render(scene, camera);
     stats.update();
     time = Date.now();
+    update();
+    //camera.lookAt(cube);
+    //console.log(controls.cannonBody.position.x);
+    //console.log("cube :" + cube.position.x);
 };
+
+
+function update(){
+    const differanceVector =new THREE.Vector3(0,0,3);
+
+    if ( controls.moveLeft ){ 
+        //console.log("pressing left...");
+        //cube.position.x+=0.1;
+    }
+    if (controls.moveRight ){
+        //console.log("pressing right...");
+        //cube.position.x+=0.1;
+    }
+    if ( controls.moveForward){ 
+        //console.log("pressing up...");
+    }
+    if ( controls.moveBackward ){ 
+        //console.log("pressing down...");
+    }
+    if ( !controls.canJump ){ 
+        //console.log("is jumping...");
+    }
+}

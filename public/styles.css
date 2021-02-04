@@ -20,3 +20,12 @@
 #root span {
     font-size: 40px;
 }
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: Monospace;
+  }
+canvas {
+    outline: none;
+}
