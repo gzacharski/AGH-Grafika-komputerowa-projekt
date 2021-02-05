@@ -1,13 +1,108 @@
 import * as THREE from '/build/three.module.js';
 import * as CANNON from '/cannon-es/dist/cannon-es.js';
 import {OrbitControls} from '/jsm/controls/OrbitControls.js';
-import {PointerLockControlsCannon} from '/cannon-es/examples/js/PointerLockControlsCannon.js';
+import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+//import {PointerLockControlsCannon} from '/cannon-es/examples/js/PointerLockControlsCannon.js';
 import Stats from '/jsm/libs/stats.module.js';
 import * as dat from '/jsm/libs/dat.gui.module.js';
 import * as Cube from '/modules/cube.js';
 import * as Ground from '/modules/ground.js';
 
+
+/** @namespace */
+var THREEx	= THREEx 		|| {};
+
+/**
+ * - NOTE: it would be quite easy to push event-driven too
+ *   - microevent.js for events handling
+ *   - in this._onkeyChange, generate a string from the DOM event
+ *   - use this as event name
+*/
+THREEx.KeyboardState	= function()
+{
+	// to store the current state
+	this.keyCodes	= {};
+	this.modifiers	= {};
+	
+	// create callback to bind/unbind keyboard events
+	var self	= this;
+	this._onKeyDown	= function(event){ self._onKeyChange(event, true); };
+	this._onKeyUp	= function(event){ self._onKeyChange(event, false);};
+
+	// bind keyEvents
+	document.addEventListener("keydown", this._onKeyDown, false);
+	document.addEventListener("keyup", this._onKeyUp, false);
+}
+
+/**
+ * To stop listening of the keyboard events
+*/
+THREEx.KeyboardState.prototype.destroy	= function()
+{
+	// unbind keyEvents
+	document.removeEventListener("keydown", this._onKeyDown, false);
+	document.removeEventListener("keyup", this._onKeyUp, false);
+}
+
+THREEx.KeyboardState.MODIFIERS	= ['shift', 'ctrl', 'alt', 'meta'];
+THREEx.KeyboardState.ALIAS	= {
+	'left'		: 37,
+	'up'		: 38,
+	'right'		: 39,
+	'down'		: 40,
+	'space'		: 32,
+	'pageup'	: 33,
+	'pagedown'	: 34,
+	'tab'		: 9
+};
+
+/**
+ * to process the keyboard dom event
+*/
+THREEx.KeyboardState.prototype._onKeyChange	= function(event, pressed)
+{
+	// log to debug
+	//console.log("onKeyChange", event, pressed, event.keyCode, event.shiftKey, event.ctrlKey, event.altKey, event.metaKey)
+
+	// update this.keyCodes
+	var keyCode		= event.keyCode;
+	this.keyCodes[keyCode]	= pressed;
+
+	// update this.modifiers
+	this.modifiers['shift']= event.shiftKey;
+	this.modifiers['ctrl']	= event.ctrlKey;
+	this.modifiers['alt']	= event.altKey;
+	this.modifiers['meta']	= event.metaKey;
+}
+
+/**
+ * query keyboard state to know if a key is pressed of not
+ *
+ * @param {String} keyDesc the description of the key. format : modifiers+key e.g shift+A
+ * @returns {Boolean} true if the key is pressed, false otherwise
+*/
+THREEx.KeyboardState.prototype.pressed	= function(keyDesc)
+{
+	var keys	= keyDesc.split("+");
+	for(var i = 0; i < keys.length; i++){
+		var key		= keys[i];
+		var pressed;
+		if( THREEx.KeyboardState.MODIFIERS.indexOf( key ) !== -1 ){
+			pressed	= this.modifiers[key];
+		}else if( Object.keys(THREEx.KeyboardState.ALIAS).indexOf( key ) != -1 ){
+			pressed	= this.keyCodes[ THREEx.KeyboardState.ALIAS[key] ];
+		}else {
+			pressed	= this.keyCodes[key.toUpperCase().charCodeAt(0)]
+		}
+		if( !pressed)	return false;
+	};
+	return true;
+}
+
+
+let mixer;
 let stats;
+var keyboard = new THREEx.KeyboardState();
 
 //three.js variables
 let scene, camera, renderer, material;
@@ -134,20 +229,32 @@ function initCannon(){
 
 function initPointerLock() {
 
-    controls = new PointerLockControlsCannon(camera, sphereBody);
-    scene.add(controls.getObject())
+    //controls = new PointerLockControlsCannon(camera, sphereBody);
+    controls = new OrbitControls( camera, renderer.domElement );
+    camera.position.set(5,5,10);
+    controls.listenToKeyEvents( window );
+    
+    controls.minDistance = 3;
+    controls.maxDistance = 5;
+
+    controls.maxPolarAngle = Math.PI / 2-Math.PI / 24;
+    controls.minPolarAngle=Math.PI / 6; 
+
+    //scene.add(controls.getObject())
 
     root.addEventListener('click', () => {
-        controls.lock()
+        console.log("clicked..")
+        //controls.lock();
+        root.style.display = 'none';
     })
 
     controls.addEventListener('lock', () => {
-        controls.enabled = true
+        //controls.enabled = true
         root.style.display = 'none'
     })
 
     controls.addEventListener('unlock', () => {
-        controls.enabled = false
+        //controls.enabled = false
         root.style.display = null
     })
 }
@@ -180,44 +287,69 @@ function addStats(){
 
 function animate() {
     requestAnimationFrame(animate);
-    if (controls.enabled) {
-        world.step(dt)
-    }
-    // cube.rotation.x += cubeRotation.speed;
-    // cube.rotation.y += 0.01;
-    // controls.update();
-    cube.position.x=controls.cannonBody.position.x;
-    cube.position.z=controls.cannonBody.position.z;
 
-    controls.update(Date.now() - time);
+    controls.update();
     renderer.render(scene, camera);
     stats.update();
-    time = Date.now();
+
     update();
-    //camera.lookAt(cube);
-    //console.log(controls.cannonBody.position.x);
-    //console.log("cube :" + cube.position.x);
+    controls.target=cube.position;
+
+    // if(camera.position.y<1.5){
+    //     camera.position.y=1.5;
+    // }
+    
 };
 
-
 function update(){
-    const differanceVector =new THREE.Vector3(0,0,3);
+    let diffvector=new THREE.Vector3().add(controls.target);
+    diffvector.sub(camera.position);
+    diffvector.multiplyScalar(0.01);
 
-    if ( controls.moveLeft ){ 
-        //console.log("pressing left...");
-        //cube.position.x+=0.1;
+    if ( keyboard.pressed("w") ){
+        cube.position.x+=diffvector.x;
+        cube.position.z+=diffvector.z;
     }
-    if (controls.moveRight ){
-        //console.log("pressing right...");
-        //cube.position.x+=0.1;
+    if ( keyboard.pressed("s") ){
+        camera.position.x-=diffvector.x;
+        camera.position.z-=diffvector.z;
+        cube.position.x-=diffvector.x;
+        cube.position.z-=diffvector.z;
     }
-    if ( controls.moveForward){ 
-        //console.log("pressing up...");
+    if ( keyboard.pressed("a") ){ 
+        camera.position.x+=diffvector.z;
+        camera.position.z-=diffvector.x;
+        cube.position.x+=diffvector.z;
+        cube.position.z-=diffvector.x;
     }
-    if ( controls.moveBackward ){ 
-        //console.log("pressing down...");
+    if ( keyboard.pressed("d") ){
+        camera.position.x-=diffvector.z;
+        camera.position.z+=diffvector.x;
+        cube.position.x-=diffvector.z;
+        cube.position.z+=diffvector.x; 
     }
-    if ( !controls.canJump ){ 
-        //console.log("is jumping...");
+    if ( keyboard.pressed("space") ){
+        console.log("is jumping..");
     }
+    
+    controls.update();
+    stats.update();
 }
+
+const loader = new FBXLoader();
+loader.load('ZombieClapping.fbx', function (object) {
+    punchingMixer = new THREE.AnimationMixer( object );
+    var action = punchingMixer.clipAction( object.animations[ 0 ] );
+    action.play();
+    object.traverse( function ( child ) {
+        if ( child.isMesh ) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+        }
+    } );
+    object.rotation.y = Math.PI * 1.1;
+    object.position.x = 0;
+    object.position.y = 0;
+    object.position.z = 120;
+    scene.add( object );
+});
