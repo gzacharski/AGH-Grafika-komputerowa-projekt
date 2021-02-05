@@ -1,7 +1,7 @@
 import * as THREE from '/build/three.module.js';
 import * as CANNON from '/cannon-es/dist/cannon-es.js';
 import {OrbitControls} from '/jsm/controls/OrbitControls.js';
-import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+import { FBXLoader } from '/jsm/loaders/FBXLoader';
 //import {PointerLockControlsCannon} from '/cannon-es/examples/js/PointerLockControlsCannon.js';
 import Stats from '/jsm/libs/stats.module.js';
 import * as dat from '/jsm/libs/dat.gui.module.js';
@@ -99,8 +99,8 @@ THREEx.KeyboardState.prototype.pressed	= function(keyDesc)
 	return true;
 }
 
-
-let mixer;
+var clock = new THREE.Clock();
+let ninjaMixer,ninja,ninjaAnimations=[];
 let stats;
 var keyboard = new THREEx.KeyboardState();
 
@@ -112,6 +112,13 @@ let world, controls, sphereShape,sphereBody, physicsMaterial;
 let time = Date.now();
 const dt=0.01;
 
+const creatureMovement={
+    isMovingForward: false,
+    isMovingBackwards: false,
+    isMovingRight: false,
+    isMovingLeft: false,
+}
+
 const root=document.getElementById('root');
 
 initThree();
@@ -119,10 +126,10 @@ axesHelper();
 initCannon();
 initPointerLock();
 //additems();
-const cube=Cube.init();
-scene.add(cube);
+// const cube=Cube.init();
+// scene.add(cube);
 addStats();
-//camera.lookAt(cube);
+
 
 animate();
 
@@ -209,7 +216,6 @@ function initCannon(){
 
     world.addContactMaterial(physics_physics);
 
-
     //user collision sphere
     const radius = 1.3
     sphereShape = new CANNON.Sphere(radius)
@@ -293,11 +299,9 @@ function animate() {
     stats.update();
 
     update();
-    controls.target=cube.position;
-
-    // if(camera.position.y<1.5){
-    //     camera.position.y=1.5;
-    // }
+    if(ninja){
+        controls.target=ninja.position;
+    }
     
 };
 
@@ -306,50 +310,156 @@ function update(){
     diffvector.sub(camera.position);
     diffvector.multiplyScalar(0.01);
 
-    if ( keyboard.pressed("w") ){
-        cube.position.x+=diffvector.x;
-        cube.position.z+=diffvector.z;
+    if(ninjaMixer){
+
+        if ( keyboard.pressed("w") ){
+            creatureMovement.isMovingForward=true;
+            // cube.position.x+=diffvector.x;
+            // cube.position.z+=diffvector.z;
+            
+            ninja.position.x+=diffvector.x;
+            ninja.position.z+=diffvector.z;
+
+            const idleAction=ninjaMixer.clipAction( ninjaAnimations[0].animations[0]);
+            
+            const walkAction=ninjaMixer.clipAction( ninjaAnimations[1].animations[0]);
+
+            walkAction.weight=0;
+            walkAction.play();
+            walkAction.crossFadeFrom(idleAction,1,true);
+            // walkAction.fadeIn(1);
+            // walkAction.play();
+        }else{
+            creatureMovement.isMovingForward=false;
+            ninjaMixer
+                .clipAction( ninjaAnimations[1].animations[0])
+                .stop();
+        }
+
+        if ( keyboard.pressed("s") ){
+            creatureMovement.isMovingBackwards=true;
+
+            camera.position.x-=diffvector.x;
+            camera.position.z-=diffvector.z;
+            // cube.position.x-=diffvector.x;
+            // cube.position.z-=diffvector.z;
+            ninja.position.x-=diffvector.x;
+            ninja.position.z-=diffvector.z;
+            
+            ninjaMixer
+                .clipAction( ninjaAnimations[2].animations[0])
+                .play();
+        }else{
+            creatureMovement.isMovingBackwards=false;
+            ninjaMixer
+                .clipAction( ninjaAnimations[2].animations[0])
+                .stop();
+        }
+
+        if ( keyboard.pressed("a") ){
+            creatureMovement.isMovingLeft=true;
+
+            camera.position.x+=diffvector.z;
+            camera.position.z-=diffvector.x;
+            // cube.position.x+=diffvector.z;
+            // cube.position.z-=diffvector.x;
+            ninja.position.x+=diffvector.z;
+            ninja.position.z-=diffvector.x;
+
+            ninjaMixer
+                .clipAction( ninjaAnimations[3].animations[0])
+                .play();
+        }else{
+            creatureMovement.isMovingLeft=false;
+            ninjaMixer
+                .clipAction( ninjaAnimations[3].animations[0])
+                .stop();
+        }
+
+        if ( keyboard.pressed("d") ){
+            creatureMovement.isMovingRight=true;
+
+            camera.position.x-=diffvector.z;
+            camera.position.z+=diffvector.x;
+            // cube.position.x-=diffvector.z;
+            // cube.position.z+=diffvector.x;
+            ninja.position.x-=diffvector.z;
+            ninja.position.z+=diffvector.x; 
+            
+            ninjaMixer
+                .clipAction( ninjaAnimations[4].animations[0])
+                .play();
+        }else{
+            creatureMovement.isMovingRight=false;
+            ninjaMixer
+                .clipAction( ninjaAnimations[4].animations[0])
+                .stop();
+        }
+
+        if ( keyboard.pressed("space") ){
+            console.log("is jumping..");
+        }else{
+
+        }
+
+        // if(!creatureMovement.isMovingForward && !creatureMovement.isMovingBackwards
+        //     && !creatureMovement.isMovingLeft && !creatureMovement.isMovingRight)
+        // {   
+        //     ninjaMixer
+        //         .clipAction( ninjaAnimations[0].animations[0])
+        //         .play();
+        // }else{
+        //     ninjaMixer
+        //         .clipAction( ninjaAnimations[0].animations[0])
+        //         .stop();
+        // }
+
+        controls.update();
+        stats.update();
+
+        var delta = clock.getDelta();
+        ninjaMixer.update(delta);
     }
-    if ( keyboard.pressed("s") ){
-        camera.position.x-=diffvector.x;
-        camera.position.z-=diffvector.z;
-        cube.position.x-=diffvector.x;
-        cube.position.z-=diffvector.z;
-    }
-    if ( keyboard.pressed("a") ){ 
-        camera.position.x+=diffvector.z;
-        camera.position.z-=diffvector.x;
-        cube.position.x+=diffvector.z;
-        cube.position.z-=diffvector.x;
-    }
-    if ( keyboard.pressed("d") ){
-        camera.position.x-=diffvector.z;
-        camera.position.z+=diffvector.x;
-        cube.position.x-=diffvector.z;
-        cube.position.z+=diffvector.x; 
-    }
-    if ( keyboard.pressed("space") ){
-        console.log("is jumping..");
-    }
-    
-    controls.update();
-    stats.update();
 }
 
 const loader = new FBXLoader();
-loader.load('ZombieClapping.fbx', function (object) {
-    punchingMixer = new THREE.AnimationMixer( object );
-    var action = punchingMixer.clipAction( object.animations[ 0 ] );
-    action.play();
-    object.traverse( function ( child ) {
+loader.load('/models/fbx/character/ninja.fbx', model => {
+    model.scale.setScalar(0.01);
+    model.traverse( function ( child ) {
         if ( child.isMesh ) {
             child.castShadow = true;
             child.receiveShadow = true;
         }
-    } );
-    object.rotation.y = Math.PI * 1.1;
-    object.position.x = 0;
-    object.position.y = 0;
-    object.position.z = 120;
-    scene.add( object );
+    });
+
+    ninja=model;
+    model.rotation.y = Math.PI * 1.1;
+    model.position.set(0,0,0);
+
+    const animations=[
+        'Neutral Idle',
+        'Walking',
+        'Walking Backwards',
+        'Left Strafe Walking',
+        'Right Strafe Walking'
+    ];
+
+    const animationLoader=new FBXLoader();
+    animations.forEach(animation =>{
+        animationLoader.load(`/models/fbx/animations/${animation}.fbx`,(theAnimation)=>{
+            ninjaMixer = new THREE.AnimationMixer( model );
+            const action = ninjaMixer.clipAction(theAnimation.animations[0]);
+            action.play();
+            action.weight=0;
+            ninjaAnimations.push(theAnimation);
+        });
+    });
+
+    animationLoader.load(`/models/fbx/animations/${animations[0]}.fbx`,(theAnimation)=>{
+        ninjaMixer = new THREE.AnimationMixer( model );
+        const action = ninjaMixer.clipAction(theAnimation.animations[0]);
+        action.play();
+    });
+ 
+    scene.add( model );
 });
