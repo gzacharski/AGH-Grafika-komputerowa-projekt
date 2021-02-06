@@ -100,7 +100,7 @@ THREEx.KeyboardState.prototype.pressed	= function(keyDesc)
 }
 
 var clock = new THREE.Clock();
-let ninjaMixer,ninja,ninjaAnimations=[];
+let ninjaMixer,ninja,ninjaAnimations=[],ninjaActions=[];
 let stats;
 var keyboard = new THREEx.KeyboardState();
 
@@ -118,6 +118,9 @@ const creatureMovement={
     isMovingRight: false,
     isMovingLeft: false,
 }
+
+//ninja actions
+let idleAction, walkAction, walkBackwardAction, turnLeftAction, turnRightAction, jumpAction;
 
 const root=document.getElementById('root');
 
@@ -314,26 +317,14 @@ function update(){
 
         if ( keyboard.pressed("w") ){
             creatureMovement.isMovingForward=true;
-            // cube.position.x+=diffvector.x;
-            // cube.position.z+=diffvector.z;
-            
+
             ninja.position.x+=diffvector.x;
             ninja.position.z+=diffvector.z;
 
-            const idleAction=ninjaMixer.clipAction( ninjaAnimations[0].animations[0]);
-            
-            const walkAction=ninjaMixer.clipAction( ninjaAnimations[1].animations[0]);
-
-            walkAction.weight=0;
-            walkAction.play();
-            walkAction.crossFadeFrom(idleAction,1,true);
-            // walkAction.fadeIn(1);
-            // walkAction.play();
+            switchAction(idleAction,walkAction);
         }else{
             creatureMovement.isMovingForward=false;
-            ninjaMixer
-                .clipAction( ninjaAnimations[1].animations[0])
-                .stop();
+            switchAction(walkAction,idleAction);
         }
 
         if ( keyboard.pressed("s") ){
@@ -341,19 +332,16 @@ function update(){
 
             camera.position.x-=diffvector.x;
             camera.position.z-=diffvector.z;
-            // cube.position.x-=diffvector.x;
-            // cube.position.z-=diffvector.z;
+
             ninja.position.x-=diffvector.x;
             ninja.position.z-=diffvector.z;
-            
-            ninjaMixer
-                .clipAction( ninjaAnimations[2].animations[0])
-                .play();
+
+            switchAction(idleAction,walkBackwardAction);
+
         }else{
             creatureMovement.isMovingBackwards=false;
-            ninjaMixer
-                .clipAction( ninjaAnimations[2].animations[0])
-                .stop();
+
+            switchAction(walkBackwardAction,idleAction);
         }
 
         if ( keyboard.pressed("a") ){
@@ -361,19 +349,16 @@ function update(){
 
             camera.position.x+=diffvector.z;
             camera.position.z-=diffvector.x;
-            // cube.position.x+=diffvector.z;
-            // cube.position.z-=diffvector.x;
+
             ninja.position.x+=diffvector.z;
             ninja.position.z-=diffvector.x;
 
-            ninjaMixer
-                .clipAction( ninjaAnimations[3].animations[0])
-                .play();
+            switchAction(idleAction,turnLeftAction);
+
         }else{
             creatureMovement.isMovingLeft=false;
-            ninjaMixer
-                .clipAction( ninjaAnimations[3].animations[0])
-                .stop();
+
+            switchAction(turnLeftAction,idleAction);
         }
 
         if ( keyboard.pressed("d") ){
@@ -381,38 +366,26 @@ function update(){
 
             camera.position.x-=diffvector.z;
             camera.position.z+=diffvector.x;
-            // cube.position.x-=diffvector.z;
-            // cube.position.z+=diffvector.x;
+
             ninja.position.x-=diffvector.z;
-            ninja.position.z+=diffvector.x; 
+            ninja.position.z+=diffvector.x;
             
-            ninjaMixer
-                .clipAction( ninjaAnimations[4].animations[0])
-                .play();
+            switchAction(idleAction,turnRightAction);
+            
         }else{
             creatureMovement.isMovingRight=false;
-            ninjaMixer
-                .clipAction( ninjaAnimations[4].animations[0])
-                .stop();
+
+            switchAction(turnRightAction,idleAction);
         }
 
         if ( keyboard.pressed("space") ){
             console.log("is jumping..");
+
+            switchAction(idleAction,jumpAction);
         }else{
 
+            switchAction(jumpAction,idleAction);
         }
-
-        // if(!creatureMovement.isMovingForward && !creatureMovement.isMovingBackwards
-        //     && !creatureMovement.isMovingLeft && !creatureMovement.isMovingRight)
-        // {   
-        //     ninjaMixer
-        //         .clipAction( ninjaAnimations[0].animations[0])
-        //         .play();
-        // }else{
-        //     ninjaMixer
-        //         .clipAction( ninjaAnimations[0].animations[0])
-        //         .stop();
-        // }
 
         controls.update();
         stats.update();
@@ -441,25 +414,144 @@ loader.load('/models/fbx/character/ninja.fbx', model => {
         'Walking',
         'Walking Backwards',
         'Left Strafe Walking',
-        'Right Strafe Walking'
+        'Right Strafe Walking',
+        'Jump'
     ];
 
+    ninjaMixer = new THREE.AnimationMixer( model );
     const animationLoader=new FBXLoader();
-    animations.forEach(animation =>{
-        animationLoader.load(`/models/fbx/animations/${animation}.fbx`,(theAnimation)=>{
-            ninjaMixer = new THREE.AnimationMixer( model );
-            const action = ninjaMixer.clipAction(theAnimation.animations[0]);
-            action.play();
-            action.weight=0;
-            ninjaAnimations.push(theAnimation);
-        });
-    });
+
+    // animations.forEach(animation =>{
+    //     animationLoader.load(`/models/fbx/animations/${animation}.fbx`,(theAnimation)=>{
+
+    //         const clip=theAnimation.animations[0];
+    //         clip.name=animation;
+    //         console.log(clip);
+
+    //         const action = ninjaMixer.clipAction(theAnimation.animations[0]);
+    //         console.log(action);
+    //         action.play();
+    //         action.weight=0;
+    //         ninjaAnimations.push(theAnimation);
+    //         action.name=animation;
+    //         ninjaActions.push(action);
+    //     });
+    // });
 
     animationLoader.load(`/models/fbx/animations/${animations[0]}.fbx`,(theAnimation)=>{
-        ninjaMixer = new THREE.AnimationMixer( model );
-        const action = ninjaMixer.clipAction(theAnimation.animations[0]);
-        action.play();
+        const clip =theAnimation.animations[0];
+        clip.name=animations[0];
+        idleAction = ninjaMixer.clipAction(clip);
+        idleAction.weight=1;
+        idleAction.enabled=true;
+        idleAction.play();
     });
- 
-    scene.add( model );
+
+    animationLoader.load(`/models/fbx/animations/${animations[1]}.fbx`,(theAnimation)=>{
+        const clip =theAnimation.animations[0];
+        clip.name=animations[1];
+        walkAction = ninjaMixer.clipAction(clip);
+        walkAction.weight=0;
+        walkAction.enabled=true;
+        walkAction.play();
+    });
+
+    animationLoader.load(`/models/fbx/animations/${animations[2]}.fbx`,(theAnimation)=>{
+        const clip =theAnimation.animations[0];
+        clip.name=animations[2];
+        walkBackwardAction = ninjaMixer.clipAction(clip);
+        walkBackwardAction.weight=0;
+        walkBackwardAction.enabled=true;
+        walkBackwardAction.play();
+    });
+
+    animationLoader.load(`/models/fbx/animations/${animations[3]}.fbx`,(theAnimation)=>{
+        const clip =theAnimation.animations[0];
+        clip.name=animations[3];
+        turnLeftAction = ninjaMixer.clipAction(clip);
+        turnLeftAction.weight=0;
+        turnLeftAction.enabled=true;
+        turnLeftAction.play();
+    });
+
+    animationLoader.load(`/models/fbx/animations/${animations[4]}.fbx`,(theAnimation)=>{
+        const clip =theAnimation.animations[0];
+        clip.name=animations[4];
+        turnRightAction = ninjaMixer.clipAction(clip);
+        turnRightAction.weight=0;
+        turnRightAction.enabled=true;
+        turnRightAction.play();
+    });
+
+    animationLoader.load(`/models/fbx/animations/${animations[5]}.fbx`,(theAnimation)=>{
+        const clip =theAnimation.animations[0];
+        clip.name=animations[5];
+        jumpAction = ninjaMixer.clipAction(clip);
+        jumpAction.weight=0;
+        jumpAction.enabled=true;
+        jumpAction.play();
+    });
+
+    scene.add(model);
 });
+
+function switchAction(fromAction,toAction){
+
+    fromAction.weight=0;
+    fromAction.enabled=false;
+
+    toAction.weight=1;
+    toAction.enabled=true;
+}
+
+function activateAllActions() {
+    ninjaActions.forEach( function ( action ) {
+        action.play();
+    } );
+}
+
+function deactivateAllActions() {
+    ninjaActions.forEach( action => {action.stop()});
+}
+
+function pauseAllActions() {
+    ninjaActions.forEach( action => {action.paused = true});
+}
+
+function unPauseAllActions() {
+    ninjaActions.forEach( action => {action.paused = false});
+}
+
+function prepareCrossFade( startAction, endAction, defaultDuration ) {
+    unPauseAllActions();
+
+    if ( startAction === idleAction ) {
+        executeCrossFade( startAction, endAction, defaultDuration);
+    } else {
+        synchronizeCrossFade( startAction, endAction, defaultDuration );
+    }
+}
+
+function synchronizeCrossFade( startAction, endAction, duration ) {
+
+    ninjaMixer.addEventListener( 'loop', onLoopFinished );
+
+    function onLoopFinished( event ) {
+        if ( event.action === startAction ) {
+            mixer.removeEventListener( 'loop', onLoopFinished );
+            executeCrossFade( startAction, endAction, duration );
+        }
+    }
+}
+
+function executeCrossFade( startAction, endAction, duration ) {
+    setWeight( endAction, 1 );
+    endAction.time = 0;
+    startAction.crossFadeTo( endAction, duration, true );
+}
+
+function setWeight( action, weight ) {
+    action.enabled = true;
+    action.setEffectiveTimeScale( 1 );
+    action.setEffectiveWeight( weight );
+}
