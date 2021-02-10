@@ -20,6 +20,9 @@ import {
 import AnimationController from '/modules/controllers/AnimationController.js';
 import Test from '/modules/controllers/TestController.js';
 import THREEx from '/extra_libs/Keyboard.js';
+import CharacterController from '/modules/controllers/CharacterController.js';
+import CharacterLoader from '/modules/loaders/CharacterLoader.js';
+
 
 let test;
 
@@ -57,6 +60,17 @@ initCannon();
 initPointerLock();
 addStats();
 loadFBX();
+
+//test=new CharacterController(camera,controls);
+let mousey;
+test=new CharacterLoader('/models/fbx/character/mousey.fbx');
+test.getCharacter()
+    .then(model=>{
+        mousey=model;
+        scene.add(mousey);
+    })
+    .catch(error=>console.log(error));
+
 
 animate();
 
@@ -114,6 +128,8 @@ function initThree(){
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.render(scene, camera);
     }, false);
+
+
 }
 
 function axesHelper(){
@@ -225,10 +241,11 @@ function update(){
         if ( keyboard.pressed("w")){
             creatureMovement.isMovingForward=true;
             walkForward(ninja,diffvector);
+
             ninjaAnimation.switchAction(currentAction,walkAction);
             currentAction=walkAction;
         }else if ( keyboard.pressed("s") ){
-
+            
             walkBackwards(ninja,camera,diffvector);
             ninjaAnimation.switchAction(currentAction,walkBackwardAction);
             currentAction=walkBackwardAction;
