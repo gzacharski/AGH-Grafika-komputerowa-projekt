@@ -22,6 +22,8 @@ import Test from '/modules/controllers/TestController.js';
 import THREEx from '/extra_libs/Keyboard.js';
 import CharacterController from '/modules/controllers/CharacterController.js';
 import CharacterLoader from '/modules/loaders/CharacterLoader.js';
+import AnimationLoader from '/modules/loaders/AnimationLoader.js';
+import Character from '/modules/controllers/Character.js';
 
 
 let test;
@@ -61,13 +63,12 @@ initPointerLock();
 addStats();
 loadFBX();
 
-//test=new CharacterController(camera,controls);
 let mousey;
-test=new CharacterLoader('/models/fbx/character/mousey.fbx');
-test.getCharacter()
-    .then(model=>{
-        mousey=model;
-        scene.add(mousey);
+new Character(scene,camera,'ninja')
+    .getCharacter()
+    .then(character=>{
+        mousey=character;
+        scene.add(mousey.model);
     })
     .catch(error=>console.log(error));
 
@@ -241,7 +242,7 @@ function update(){
         if ( keyboard.pressed("w")){
             creatureMovement.isMovingForward=true;
             walkForward(ninja,diffvector);
-
+            mousey.model.position.x+=0.1;
             ninjaAnimation.switchAction(currentAction,walkAction);
             currentAction=walkAction;
         }else if ( keyboard.pressed("s") ){
@@ -265,8 +266,8 @@ function update(){
             ninjaAnimation.switchAction(currentAction,jumpAction);
             currentAction=jumpAction;
         }else{
-            ninjaAnimation.switchAction(currentAction,idleAction);
-            currentAction=idleAction;
+            // ninjaAnimation.switchAction(currentAction,idleAction);
+            // currentAction=idleAction;
         }
 
         controls.update();
@@ -274,12 +275,15 @@ function update(){
 
         var delta = clock.getDelta();
         ninjaMixer.update(delta);
+        if(mousey){
+            mousey.mixer.update(delta);
+        }   
     }
 }
 
 function loadFBX(){
     const loader = new FBXLoader();
-    loader.load('/models/fbx/character/ninja.fbx', model => {
+    loader.load('/models/fbx/characters/ninja.fbx', model => {
         model.scale.setScalar(0.01);
         model.traverse( function ( child ) {
             if ( child.isMesh ) {

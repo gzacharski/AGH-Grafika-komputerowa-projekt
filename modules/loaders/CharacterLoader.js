@@ -2,14 +2,15 @@ import { FBXLoader } from '/jsm/loaders/FBXLoader';
 
 export default class CharacterLoader{
     constructor(fileName){
-        this.character=this._loadCharacter(fileName);
+        this._character=this._loadCharacter(fileName);
     }
 
     _loadCharacter(fileName){
         return new Promise((resolve,reject)=>{
             const loader = new FBXLoader();
+            loader.setPath("/models/fbx/characters/")
 
-            loader.loadAsync(fileName,this._onLoading)
+            loader.loadAsync(`${fileName}.fbx`,this._onLoading)
                 .then(model=>this._afterLoaded(model,resolve))
                 .catch(model=>this._onError(model,reject))
                 .finally(this._onFinally);
@@ -31,7 +32,6 @@ export default class CharacterLoader{
         
         model.rotation.y = Math.PI * 1.1;
         model.position.set(2,0,2);
-        console.log("Model loaded");
         resolve(model);
     }
 
@@ -44,6 +44,6 @@ export default class CharacterLoader{
     }
 
     getCharacter(){
-        return this.character;
+        return this._character;
     }    
 }
