@@ -4,12 +4,13 @@ import AnimationLoader from '/modules/loaders/AnimationLoader.js';
 import * as THREE from '/build/three.module.js';
 
 const animations=[
-    'Neutral Idle',
+    'NeutralIdle',
     'Walking',
-    'Walking Backwards',
-    'Left Strafe Walking',
-    'Right Strafe Walking',
-    'Jump'
+    'WalkingBackwards',
+    'LeftStrafeWalking',
+    'RightStrafeWalking',
+    'Jump',
+    'Running'
 ];
 
 const clock = new THREE.Clock();
@@ -58,7 +59,7 @@ export default class Character{
                 })
             }
 
-            this.controller=new CharacterController(tempModel,camera,controls);
+            this.controller=new CharacterController(tempModel,camera,controls,actions);
             
             return {
                 model: tempModel,
