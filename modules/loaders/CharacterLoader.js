@@ -31,7 +31,7 @@ export default class CharacterLoader{
         });
         
         model.rotation.y = Math.PI * 1.1;
-        model.position.set(2,0,2);
+        model.position.set(1,0,1);
         resolve(model);
     }
 

@@ -16,11 +16,12 @@ const clock = new THREE.Clock();
 
 export default class Character{
 
-    constructor(scene,camera,name){
-        this._character=this._init(scene,name);
+    constructor(name,camera,controls){
+        this._character=this._init(name,camera,controls);
+        this.controller;
     }
 
-    async _init(scene,name){
+    async _init(name,camera,controls){
         try{
             const animationLoader=new AnimationLoader(animations);
             const anims=animationLoader.getAnimations()
@@ -56,6 +57,8 @@ export default class Character{
                     action
                 })
             }
+
+            this.controller=new CharacterController(tempModel,camera,controls);
             
             return {
                 model: tempModel,

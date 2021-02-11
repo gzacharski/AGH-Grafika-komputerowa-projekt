@@ -3,7 +3,8 @@ import * as THREE from '/build/three.module.js';
 
 export default class CharacterController {
 
-    constructor(camera,controls){
+    constructor(model,camera,controls){
+        this.model=model;
         this.camera=camera;
         this.controls=controls;
         this.keyboard=new THREEx.KeyboardState();
@@ -14,22 +15,20 @@ export default class CharacterController {
     }
     
     _onKeyDown(event){
-        let diffvector=new THREE.Vector3().add(this.controls.target);
+        let diffvector=new THREE.Vector3().add(this.model.position);
         diffvector.sub(this.camera.position);
-        diffvector.multiplyScalar(0.01);
-        
-        if(this.keyboard.pressed("w")){
-            console.log("Logging from character Controller : w - down" +event.keyCode);
-            console.log(diffvector);
-        }
+        diffvector.multiplyScalar(0.1);
+
+        if(this.keyboard.pressed("w")) this._walkForward(this.model, diffvector);
+        if(this.keyboard.pressed("s")) this._walkBackwards(this.model,this.camera,diffvector);
+        if(this.keyboard.pressed("a")) this._walkLeft(this.model,this.camera,diffvector);
+        if(this.keyboard.pressed("d")) this._walkRight(this.model,this.camera,diffvector);
     }
 
     _onKeyUp(event){
-        let diffvector=new THREE.Vector3().add(this.controls.target);
-        diffvector.sub(this.camera.position);
-        diffvector.multiplyScalar(0.01);
-        console.log("Logging from character Controller : w - up" +event.keyCode);
-        console.log(diffvector);
+        // let diffvector=new THREE.Vector3().add(this.model.position);
+        // diffvector.sub(this.camera.position);
+        // diffvector.multiplyScalar(0.01);
     }
 
     _onClick(event){
@@ -40,44 +39,36 @@ export default class CharacterController {
         console.log("Logging from character Controller : clicked right");
     }
 
-    _walkRight(){
-
-    }
-
-    _walkForward(ninja, diffvector){
+    _walkForward(model,diffvector){
         //switchAction(idleAction,walkAction);
-        ninja.position.x+=diffvector.x;
-        ninja.position.z+=diffvector.z;
+        model.position.x+=diffvector.x;
+        model.position.z+=diffvector.z;
     }
     
-    _walkBackwards(ninja, camera,diffvector){
+    _walkBackwards(model, camera,diffvector){
+        //switchAction(idleAction,walkBackwardAction);
         camera.position.x-=diffvector.x;
         camera.position.z-=diffvector.z;
     
-        ninja.position.x-=diffvector.x;
-        ninja.position.z-=diffvector.z;
-    
-        //switchAction(idleAction,walkBackwardAction);
+        model.position.x-=diffvector.x;
+        model.position.z-=diffvector.z;
     }
     
-    _walkRight(ninja, camera,diffvector){
+    _walkRight(model, camera,diffvector){
+        // switchAction(idleAction,turnRightAction);
         camera.position.x-=diffvector.z;
         camera.position.z+=diffvector.x;
     
-        ninja.position.x-=diffvector.z;
-        ninja.position.z+=diffvector.x;
-    
-        // switchAction(idleAction,turnRightAction);
+        model.position.x-=diffvector.z;
+        model.position.z+=diffvector.x;
     }
     
-    _walkLeft(ninja, camera,diffvector){
-    
+    _walkLeft(model, camera,diffvector){
+        // switchAction(idleAction,turnLeftAction);
         camera.position.x+=diffvector.z;
         camera.position.z-=diffvector.x;
     
-        ninja.position.x+=diffvector.z;
-        ninja.position.z-=diffvector.x;
-    
-        // switchAction(idleAction,turnLeftAction);
+        model.position.x+=diffvector.z;
+        model.position.z-=diffvector.x;
     }
 }

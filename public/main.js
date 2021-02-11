@@ -1,58 +1,22 @@
 import * as THREE from '/build/three.module.js';
 import * as CANNON from '/cannon-es/dist/cannon-es.js';
 import {OrbitControls} from '/jsm/controls/OrbitControls.js';
-import { FBXLoader } from '/jsm/loaders/FBXLoader';
 //import {PointerLockControlsCannon} from '/cannon-es/examples/js/PointerLockControlsCannon.js';
 import Stats from '/jsm/libs/stats.module.js';
 import * as dat from '/jsm/libs/dat.gui.module.js';
-import * as Cube from '/modules/cube.js';
-import * as Ground from '/modules/ground.js';
-import {
-    walkForward,
-    walkBackwards,
-    walkRight,
-    walkLeft,
-    turnRight,
-    turnLeft,
-    jump,
-    run
-} from '/modules/controllers/creatureController.js';
-import AnimationController from '/modules/controllers/AnimationController.js';
-import Test from '/modules/controllers/TestController.js';
-import THREEx from '/extra_libs/Keyboard.js';
-import CharacterController from '/modules/controllers/CharacterController.js';
-import CharacterLoader from '/modules/loaders/CharacterLoader.js';
-import AnimationLoader from '/modules/loaders/AnimationLoader.js';
 import Character from '/modules/controllers/Character.js';
 
-
-let test;
-
-var clock = new THREE.Clock();
-let ninjaMixer,ninja,ninjaAnimations=[],ninjaActions=[];
+const clock = new THREE.Clock();
 let stats;
-var keyboard = new THREEx.KeyboardState();
 
 //three.js variables
 let scene, camera, renderer, material;
 
 //cannon.js variables
 let world, controls, sphereShape,sphereBody, physicsMaterial;
-let time = Date.now();
-const dt=0.01;
 
-const creatureMovement={
-    isMovingForward: false,
-    isMovingBackwards: false,
-    isMovingRight: false,
-    isMovingLeft: false,
-}
-
-let ninjaAnimation;
-
-//ninja actions
-let idleAction, walkAction, walkBackwardAction, turnLeftAction, turnRightAction, jumpAction;
-let currentAction;
+//models
+let character;
 
 const root=document.getElementById('root');
 
@@ -61,18 +25,7 @@ axesHelper();
 initCannon();
 initPointerLock();
 addStats();
-loadFBX();
-
-let mousey;
-new Character(scene,camera,'ninja')
-    .getCharacter()
-    .then(character=>{
-        mousey=character;
-        scene.add(mousey.model);
-    })
-    .catch(error=>console.log(error));
-
-
+initCharacter();
 animate();
 
 function initThree(){
@@ -178,7 +131,6 @@ function initCannon(){
 }
 
 function initPointerLock() {
-
     //controls = new PointerLockControlsCannon(camera, sphereBody);
     controls = new OrbitControls( camera, renderer.domElement );
     camera.position.set(5,5,10);
@@ -210,11 +162,20 @@ function initPointerLock() {
 }
 
 function addStats(){
-
     const gui = new dat.GUI();
     const cam=gui.addFolder('Camera');
     cam.add(camera.position, 'x').getValue();
-}   
+}
+
+function initCharacter(){
+    new Character('ninja',camera,controls)
+        .getCharacter()
+        .then(theCharacter=>{
+            character=theCharacter;
+            scene.add(character.model);
+        })
+        .catch(error=>console.log(error));
+}
 
 function animate() {
     requestAnimationFrame(animate);
@@ -223,146 +184,10 @@ function animate() {
     renderer.render(scene, camera);
     stats.update();
 
-    if(!currentAction){
-        currentAction=idleAction;
-    }
+    var delta = clock.getDelta();
 
-    update();
-    if(ninja){
-        controls.target=ninja.position;
-    }
+    if(character){
+        controls.target=character.model.position;
+        character.mixer.update(delta);
+    } 
 };
-
-function update(){
-    let diffvector=new THREE.Vector3().add(controls.target);
-    diffvector.sub(camera.position);
-    diffvector.multiplyScalar(0.01);
-
-    if(ninjaMixer){
-        if ( keyboard.pressed("w")){
-            creatureMovement.isMovingForward=true;
-            walkForward(ninja,diffvector);
-            mousey.model.position.x+=0.1;
-            ninjaAnimation.switchAction(currentAction,walkAction);
-            currentAction=walkAction;
-        }else if ( keyboard.pressed("s") ){
-            
-            walkBackwards(ninja,camera,diffvector);
-            ninjaAnimation.switchAction(currentAction,walkBackwardAction);
-            currentAction=walkBackwardAction;
-
-        }else if ( keyboard.pressed("a") ){
-
-            walkLeft(ninja,camera,diffvector);
-            ninjaAnimation.switchAction(currentAction,turnLeftAction);
-            currentAction=turnLeftAction;
-        }else if ( keyboard.pressed("d") ){
-
-            walkRight(ninja,camera,diffvector);
-            ninjaAnimation.switchAction(currentAction,turnRightAction);
-            currentAction=turnRightAction;
-        }else if ( keyboard.pressed("space") ){
-
-            ninjaAnimation.switchAction(currentAction,jumpAction);
-            currentAction=jumpAction;
-        }else{
-            // ninjaAnimation.switchAction(currentAction,idleAction);
-            // currentAction=idleAction;
-        }
-
-        controls.update();
-        stats.update();
-
-        var delta = clock.getDelta();
-        ninjaMixer.update(delta);
-        if(mousey){
-            mousey.mixer.update(delta);
-        }   
-    }
-}
-
-function loadFBX(){
-    const loader = new FBXLoader();
-    loader.load('/models/fbx/characters/ninja.fbx', model => {
-        model.scale.setScalar(0.01);
-        model.traverse( function ( child ) {
-            if ( child.isMesh ) {
-                child.castShadow = true;
-                child.receiveShadow = true;
-            }
-        });
-
-        ninja=model;
-        model.rotation.y = Math.PI * 1.1;
-        model.position.set(0,0,0);
-
-        const animations=[
-            'Neutral Idle',
-            'Walking',
-            'Walking Backwards',
-            'Left Strafe Walking',
-            'Right Strafe Walking',
-            'Jump'
-        ];
-
-        ninjaMixer = new THREE.AnimationMixer( model );
-        const animationLoader=new FBXLoader();
-
-        animationLoader.load(`/models/fbx/animations/${animations[0]}.fbx`,(theAnimation)=>{
-            const clip =theAnimation.animations[0];
-            clip.name=animations[0];
-            idleAction = ninjaMixer.clipAction(clip);
-            idleAction.weight=1;
-            idleAction.enabled=true;
-            idleAction.play();
-            ninjaAnimation=new AnimationController(ninjaMixer,idleAction);
-        });
-
-        animationLoader.load(`/models/fbx/animations/${animations[1]}.fbx`,(theAnimation)=>{
-            const clip =theAnimation.animations[0];
-            clip.name=animations[1];
-            walkAction = ninjaMixer.clipAction(clip);
-            walkAction.weight=0;
-            walkAction.enabled=true;
-            walkAction.play();
-        });
-
-        animationLoader.load(`/models/fbx/animations/${animations[2]}.fbx`,(theAnimation)=>{
-            const clip =theAnimation.animations[0];
-            clip.name=animations[2];
-            walkBackwardAction = ninjaMixer.clipAction(clip);
-            walkBackwardAction.weight=0;
-            walkBackwardAction.enabled=true;
-            walkBackwardAction.play();
-        });
-
-        animationLoader.load(`/models/fbx/animations/${animations[3]}.fbx`,(theAnimation)=>{
-            const clip =theAnimation.animations[0];
-            clip.name=animations[3];
-            turnLeftAction = ninjaMixer.clipAction(clip);
-            turnLeftAction.weight=0;
-            turnLeftAction.enabled=true;
-            turnLeftAction.play();
-        });
-
-        animationLoader.load(`/models/fbx/animations/${animations[4]}.fbx`,(theAnimation)=>{
-            const clip =theAnimation.animations[0];
-            clip.name=animations[4];
-            turnRightAction = ninjaMixer.clipAction(clip);
-            turnRightAction.weight=0;
-            turnRightAction.enabled=true;
-            turnRightAction.play();
-        });
-
-        animationLoader.load(`/models/fbx/animations/${animations[5]}.fbx`,(theAnimation)=>{
-            const clip =theAnimation.animations[0];
-            clip.name=animations[5];
-            jumpAction = ninjaMixer.clipAction(clip);
-            jumpAction.weight=0;
-            jumpAction.enabled=true;
-            jumpAction.play();
-        });
-
-        scene.add(model);
-    });
-}
