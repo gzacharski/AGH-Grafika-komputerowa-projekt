@@ -59,13 +59,15 @@ export default class Character{
                 })
             }
 
-            this.controller=new CharacterController(tempModel,camera,controls,actions);
-            
-            return {
+            const tempCharacter={
                 model: tempModel,
                 mixer: tempMixer,
                 actions
             }
+
+            this.controller=new CharacterController(tempCharacter,camera,controls);
+            
+            return tempCharacter;
         }catch(error){
             console.log(Error(error))
             return null;

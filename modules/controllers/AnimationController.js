@@ -9,11 +9,7 @@ export default class AnimationController {
 
     switchAction(fromAction, toAction){
         const duration=0.2;
-        fromAction.weight=0;
-        toAction.weight=1;
-        //toAction.clampWhenFinished=true;
-        //toAction.crossFadeFrom(fromAction, duration,true);
-        //prepareCrossFade(fromAction,toAction,duration, this.mixer,this.idleAction);
+        prepareCrossFade(fromAction,toAction,duration, this.mixer,this.idleAction);
     }
 }
 
@@ -39,11 +35,14 @@ function synchronizeCrossFade( startAction, endAction, duration, mixer ) {
 }
 
 function executeCrossFade( startAction, endAction, duration ) {
-    // endAction.enabled=true;
-    // endAction.setEffectiveTimeScale(duration);
-    // endAction.setEffectiveWeight(1);
-    // endAction.loop=THREE.LoopRepeat;
+    setWeight(endAction,1);
     endAction.time = 0;
     startAction.crossFadeTo( endAction, duration, true );
+}
+
+function setWeight( action, weight ) {
+    action.enabled = true;
+    action.setEffectiveTimeScale( 1 );
+    action.setEffectiveWeight( weight );
 
 }

@@ -1,15 +1,18 @@
 import THREEx from '/extra_libs/Keyboard.js';
 import * as THREE from '/build/three.module.js';
+import AnimationController from '/modules/controllers/AnimationController.js';
 
 export default class CharacterController {
 
-    constructor(model,camera,controls,actions){
-        this.model=model;
+    constructor(character,camera,controls){
+        this.model=character.model;
         this.camera=camera;
         this.controls=controls;
-        this.actions=this._initActions(actions);
+        this.actions=this._initActions(character.actions);
         this.keyboard=new THREEx.KeyboardState();
         this.currentAction=this.actions.NeutralIdle;
+        this.animationController=new AnimationController(character.mixer,this.actions.NeutralIdle)
+
         document.addEventListener('keydown', (event)=>this._onKeyDown(event));
         document.addEventListener('keyup', (event)=>this._onKeyUp(event));
         document.addEventListener('click', (event)=>this._onClick(event));
@@ -19,7 +22,6 @@ export default class CharacterController {
     _initActions(actions){
         let tempActions={};
         actions.forEach(element=>tempActions[element.name]=element.action);
-        console.log(tempActions);
         return tempActions;
     }
     
@@ -27,7 +29,7 @@ export default class CharacterController {
         let diffvector=new THREE.Vector3().add(this.model.position);
         diffvector.sub(this.camera.position);
         diffvector.multiplyScalar(0.05);
-        console.log("Keyboard pressed...");
+        //console.log("Keyboard pressed...");
 
         if(this.keyboard.pressed("w")) this._walkForward(this.model, diffvector);
         if(this.keyboard.pressed("s")) this._walkBackwards(this.model,this.camera,diffvector);
@@ -38,7 +40,7 @@ export default class CharacterController {
     }
 
     _onKeyUp(event){
-        console.log("keyboard released...");
+        //console.log("keyboard released...");
         const {NeutralIdle}=this.actions;
         this._switchCurrentActionTo(NeutralIdle);
     }
@@ -53,9 +55,11 @@ export default class CharacterController {
 
     _walkForward(model,diffvector){
         const {Walking}=this.actions;
-
-        model.position.x+=diffvector.x;
-        model.position.z+=diffvector.z;
+        const factor=Walking.weight;
+        
+        model.position.x+=factor*diffvector.x; 
+        model.position.z+=factor*diffvector.z;
+        
         this._switchCurrentActionTo(Walking);
     }
     
@@ -108,10 +112,9 @@ export default class CharacterController {
     }
 
     _switchCurrentActionTo(toAction){
-        if(toAction.weight===1) return;
-
-        this.currentAction.weight=0;
-        toAction.weight=1;
+        if(toAction===this.currentAction) return;
+        
+        this.animationController.switchAction(this.currentAction,toAction);
         this.currentAction=toAction;
     }
 }
