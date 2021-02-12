@@ -9,7 +9,8 @@ const animations=[
     'WalkingBackwards',
     'LeftStrafeWalking',
     'RightStrafeWalking',
-    'Jump',
+    'JumpInIdle',
+    'JumpInRun',
     'Running'
 ];
 
