@@ -4,8 +4,8 @@ import {OrbitControls} from '/jsm/controls/OrbitControls.js';
 //import {PointerLockControlsCannon} from '/cannon-es/examples/js/PointerLockControlsCannon.js';
 import Stats from '/jsm/libs/stats.module.js';
 import * as dat from '/jsm/libs/dat.gui.module.js';
-import Character from '/modules/controllers/Character.js';
-import InputController from '/modules/controllers/InputController.js';
+import Character from '/modules/Character.js';
+import TestCharacter from '/modules/controllers/TestCharacter.js';
 
 const clock = new THREE.Clock();
 let stats;
@@ -27,9 +27,12 @@ initCannon();
 initPointerLock();
 addStats();
 initCharacter();
+
+let testCharacter=new TestCharacter();
+
 animate();
 
-new InputController();
+
 
 function initThree(){
     scene = new THREE.Scene();
@@ -192,5 +195,10 @@ function animate() {
     if(character){
         controls.target=character.model.position;
         character.mixer.update(delta);
-    } 
+    }
+
+    if(testCharacter){
+        testCharacter.update(delta);
+    }
+
 };

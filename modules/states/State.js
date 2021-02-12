@@ -1,9 +1,10 @@
 export default class State{
     constructor(parent){
         this._parent=parent;
+        this._duration=0.2;
     }
 
-    enter(){
+    enter(previouState){
         console.log("entering to the state...");
     }
 
@@ -11,7 +12,7 @@ export default class State{
         console.log("exiting the state...");
     }
 
-    update(){
+    update(timeElapsed,input){
         console.log("updating the state...");
     }
 }

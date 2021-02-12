@@ -24,6 +24,7 @@ export default class InputController {
     _onKeyDown=()=>{
         if(this._keyboard.pressed("w+shift")) {
             this.keyPressed.shift=true;
+            this.keyPressed.forward=true;
             return;
         }
         if(this._keyboard.pressed("w")) this.keyPressed.forward=true;

@@ -104,9 +104,9 @@ export default class CharacterController {
     }
 
     _jump(model){
-        const {Jump}=this.actions;
+        const {JumpInIdle}=this.actions;
 
-        this._switchCurrentActionTo(Jump);
+        this._switchCurrentActionTo(JumpInIdle);
     }
 
     _run(model, diffvector){
