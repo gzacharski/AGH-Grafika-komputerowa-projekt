@@ -5,6 +5,7 @@ import {OrbitControls} from '/jsm/controls/OrbitControls.js';
 import Stats from '/jsm/libs/stats.module.js';
 import * as dat from '/jsm/libs/dat.gui.module.js';
 import Character from '/modules/controllers/Character.js';
+import InputController from '/modules/controllers/InputController.js';
 
 const clock = new THREE.Clock();
 let stats;
@@ -27,6 +28,8 @@ initPointerLock();
 addStats();
 initCharacter();
 animate();
+
+new InputController();
 
 function initThree(){
     scene = new THREE.Scene();
