@@ -5,7 +5,7 @@ import {OrbitControls} from '/jsm/controls/OrbitControls.js';
 import Stats from '/jsm/libs/stats.module.js';
 import * as dat from '/jsm/libs/dat.gui.module.js';
 import Character from '/modules/Character.js';
-import TestCharacter from '/modules/controllers/TestCharacter.js';
+import TestCharacter from '/modules/TestCharacter.js';
 
 const clock = new THREE.Clock();
 let stats;
