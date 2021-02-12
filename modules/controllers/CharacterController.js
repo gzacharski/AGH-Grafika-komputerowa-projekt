@@ -31,12 +31,16 @@ export default class CharacterController {
         diffvector.multiplyScalar(0.05);
         //console.log("Keyboard pressed...");
 
+        if(this.keyboard.pressed("w+shift")) {
+            this._run(this.model,diffvector);
+            return;
+        }
+
         if(this.keyboard.pressed("w")) this._walkForward(this.model, diffvector);
         if(this.keyboard.pressed("s")) this._walkBackwards(this.model,this.camera,diffvector);
         if(this.keyboard.pressed("a")) this._walkLeft(this.model,this.camera,diffvector);
         if(this.keyboard.pressed("d")) this._walkRight(this.model,this.camera,diffvector);
         if(this.keyboard.pressed("space")) this._jump(this.model);
-        if(this.keyboard.pressed("w+shift")) this._run(this.model,this.camera,diffvector);
     }
 
     _onKeyUp(event){
@@ -105,15 +109,18 @@ export default class CharacterController {
         this._switchCurrentActionTo(Jump);
     }
 
-    _run(model, camera,diffvector){
+    _run(model, diffvector){
         const {Running}=this.actions;
+        const factor=Running.weight;
 
+        model.position.x+=factor*diffvector.x; 
+        model.position.z+=factor*diffvector.z;
         this._switchCurrentActionTo(Running);
     }
 
     _switchCurrentActionTo(toAction){
         if(toAction===this.currentAction) return;
-        
+
         this.animationController.switchAction(this.currentAction,toAction);
         this.currentAction=toAction;
     }
