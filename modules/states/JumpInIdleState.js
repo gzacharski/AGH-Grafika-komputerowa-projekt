@@ -5,14 +5,17 @@ export default class JumpInIdle extends State{
         super(parent,action);
     }
 
-    enter(previousState){
+    enter(){
         console.log('jumpInIdle ...');
-
-        setTimeout(()=>{
-            console.log("From jump to idle");
-            const {neutralIdle}=this._parent._states;
-            this._parent.setState(neutralIdle);
-        },200);
+        
+        setTimeout(
+            ()=>{
+                console.log("From jump to idle");
+                const {neutralIdle}=this._parent._states;
+                this._parent.setState(neutralIdle);
+            },
+            this._action._clip.duration*1000
+        );
     }
 
     exit(){}

@@ -2,9 +2,9 @@ import * as THREE from '/build/three.module.js';
 
 export default class AnimationController {
 
-    constructor(mixer, idleAction){
-        this.mixer=mixer;
-        this.idleAction=idleAction;
+    constructor(stateMachine){
+        this.mixer=stateMachine._character.mixer;
+        this.idleAction=stateMachine._character.actions.NeutralIdle;
     }
 
     switchAction(fromAction, toAction){

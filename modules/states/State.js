@@ -1,7 +1,6 @@
 export default class State{
     constructor(parent,action){
         this._parent=parent;
-        this._duration=0.2;
         this._action=action;
     }
 

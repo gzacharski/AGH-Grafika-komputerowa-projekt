@@ -11,6 +11,7 @@ import AnimationController from '/modules/controllers/AnimationController.js';
 export default class CharacterStateMachine{
 
     constructor(character){
+        this._canSwitchAnimation=true;
         this._character=character;
         this._states = {
           jumpInIdle : new JumpInIdleState(this,this._character.actions.JumpInIdle),
@@ -23,17 +24,21 @@ export default class CharacterStateMachine{
           walking : new WalkingState(this,this._character.actions.Walking),
         };
         this._currentState = this._states.neutralIdle;
-        this._animationController=new AnimationController(this._character.mixer,this._character.actions.NeutralIdle);
+        this._animationController=new AnimationController(this);
     }
 
     setState(stateToSet) {
       const prevState = this._currentState;
 
-      if (prevState == stateToSet) return;
-    
+      if (prevState == stateToSet){
+        this._currentState.enter(prevState);
+        return;
+      } 
+      
+      if(!this._canSwitchAnimation) return;
+
       this._switchCurrentActionTo(stateToSet._action);
       this._currentState = stateToSet;
-
       this._currentState.enter(prevState);
     }
   
@@ -46,6 +51,16 @@ export default class CharacterStateMachine{
     _switchCurrentActionTo(toAction){
       if(toAction===this._currentState._action) return;
 
-      this._animationController.switchAction(this._currentState._action,toAction);
-  }
+      this._canSwitchAnimation=false;
+
+      toAction.enabled = true;
+      toAction.setEffectiveTimeScale( 1 );
+      toAction.setEffectiveWeight( 1 );
+      toAction.time = 0;
+      this._currentState._action.crossFadeTo( toAction, 0.5, true );
+
+      setTimeout(() => {
+        this._canSwitchAnimation=true;
+      }, 500);
+    }
 }

@@ -14,18 +14,18 @@ export default class RunningState extends State{
     update(timeElapsed,input){
         const {forward,space,shift}=input.keyPressed;
         const {neutralIdle,walking,jumpInRun}=this._parent._states;
-
-        if(!forward){
-            console.log("From running to idle");
-            this._parent.setState(neutralIdle);
+        
+        if(forward && shift && space){
+            console.log("From walking to jump in run");
+            this._parent.setState(jumpInRun);
 
         }else if(forward && !shift){
             console.log("From running to walking");
             this._parent.setState(walking);
-        
-        }else if(forward && shift && space){
-            console.log("From running to jump in run");
-            this._parent.setState(jumpInRun);
+
+        }else if(!forward){
+            console.log("From running to idle");
+            this._parent.setState(neutralIdle);
         }
     }
 }

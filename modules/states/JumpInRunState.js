@@ -7,12 +7,15 @@ export default class JumpInRunState extends State{
 
     enter(previousState){
         console.log('jumpInRun...');
-
-        setTimeout(()=>{
-            console.log("From jumpInRun to run");
-            const {running}=this._parent._states;
-            this._parent.setState(running);
-        },300);
+        
+        setTimeout(
+            ()=>{
+                console.log("From jumpInRun to run");
+                const {running}=this._parent._states;
+                this._parent.setState(running);
+            },
+            this._action._clip.duration*1000
+        );
     }
 
     exit(){}

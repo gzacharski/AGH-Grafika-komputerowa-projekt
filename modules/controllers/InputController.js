@@ -22,6 +22,7 @@ export default class InputController {
     }   
 
     _onKeyDown=()=>{
+        if(this._keyboard.pressed("space")) this.keyPressed.space=true;
         if(this._keyboard.pressed("w+shift")) {
             this.keyPressed.shift=true;
             this.keyPressed.forward=true;
@@ -31,7 +32,6 @@ export default class InputController {
         if(this._keyboard.pressed("s")) this.keyPressed.backward=true;
         if(this._keyboard.pressed("a")) this.keyPressed.left=true;
         if(this._keyboard.pressed("d")) this.keyPressed.right=true;
-        if(this._keyboard.pressed("space")) this.keyPressed.space=true;
     }
 
     _onKeyUp=()=>{
