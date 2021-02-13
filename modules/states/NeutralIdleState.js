@@ -7,22 +7,6 @@ export default class NeutralIdleState extends State{
 
     enter(previousState){
         console.log('neutralIdle...');
-
-
-        // const currentAction=this._parent._proxy._animations['neutralIdle'].action;
-
-        // if(previousState){
-        //     const previousAction=this._parent._proxy._animations[previousState.name].action;
-
-        //     currentAction.enabled=true;
-        //     currentAction.setEffectiveTimeScale(1);
-        //     currentAction.setEffectiveWeight(1);
-        //     currentAction.time = 0;
-        //     currentAction.crossFadeFrom( previousAction, this._duration, true );
-        //     currentAction.play();
-        // }else{
-        //     currentAction.play();
-        // }
     }
 
     exit(){}

@@ -1,7 +1,8 @@
-import CharacterController from '/modules/controllers/CharacterController.js';
 import CharacterLoader from '/modules/loaders/CharacterLoader.js';
 import AnimationLoader from '/modules/loaders/AnimationLoader.js';
 import * as THREE from '/build/three.module.js';
+import InputController from '/modules/controllers/InputController.js';
+import CharacterStateMachine from '/modules/states/CharacterStateMachine.js';
 
 const animations=[
     'NeutralIdle',
@@ -18,12 +19,13 @@ const clock = new THREE.Clock();
 
 export default class Character{
 
-    constructor(name,camera,controls){
-        this._character=this._init(name,camera,controls);
-        this.controller;
+    constructor(name){
+        this._input=new InputController();
+        this._stateMachine;
+        this._character=this._init(name);
     }
 
-    async _init(name,camera,controls){
+    async _init(name){
         try{
             const animationLoader=new AnimationLoader(animations);
             const anims=animationLoader.getAnimations()
@@ -36,7 +38,6 @@ export default class Character{
                 clip.name=theAnimation.name;
                 clips.push(clip);
             }
-
             const characterLoader=new CharacterLoader(name);
             const tempModel=await characterLoader.getCharacter();
             const tempMixer=new THREE.AnimationMixer( tempModel);
@@ -54,19 +55,16 @@ export default class Character{
                 action.enabled=true;
                 action.play();
 
-                actions.push({
-                    name: clip.name,
-                    action
-                })
+                actions[clip.name]=action;
             }
 
             const tempCharacter={
-                model: tempModel,
+                actions,
                 mixer: tempMixer,
-                actions
+                model: tempModel,
             }
 
-            this.controller=new CharacterController(tempCharacter,camera,controls);
+            this._stateMachine=new CharacterStateMachine(tempCharacter);
             
             return tempCharacter;
         }catch(error){
@@ -77,5 +75,11 @@ export default class Character{
 
     getCharacter(){
         return this._character;
+    }
+
+    update(timeInSeconds){
+        if(!this._stateMachine._currentState) return;
+
+        this._stateMachine.update(timeInSeconds,this._input);
     }
 }

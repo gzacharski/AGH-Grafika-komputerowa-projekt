@@ -11,7 +11,9 @@ export default class InputController {
             space: false,
             shift: false,
             leftClick: false,
-            rightClick: false
+            rightClick: false,
+            arrowLeft: false,
+            arrowRight: false
         }
         this._keyboard=new THREEx.KeyboardState();
 
@@ -22,6 +24,8 @@ export default class InputController {
     }   
 
     _onKeyDown=()=>{
+        if(this._keyboard.pressed("left")) this.keyPressed.arrowLeft=true;
+        if(this._keyboard.pressed("right")) this.keyPressed.arrowRight=true;
         if(this._keyboard.pressed("space")) this.keyPressed.space=true;
         if(this._keyboard.pressed("w+shift")) {
             this.keyPressed.shift=true;
@@ -35,6 +39,8 @@ export default class InputController {
     }
 
     _onKeyUp=()=>{
+        if(!this._keyboard.pressed("left")) this.keyPressed.arrowLeft=false;
+        if(!this._keyboard.pressed("right")) this.keyPressed.arrowRight=false;
         if(!this._keyboard.pressed("w+shift")) this.keyPressed.shift=false;
         if(!this._keyboard.pressed("w")) this.keyPressed.forward=false;
         if(!this._keyboard.pressed("s")) this.keyPressed.backward=false;

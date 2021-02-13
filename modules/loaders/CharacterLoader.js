@@ -30,8 +30,8 @@ export default class CharacterLoader{
             }
         });
         
-        model.rotation.y = Math.PI * 1.1;
-        model.position.set(1,0,1);
+        model.rotation.y = Math.PI;
+        model.position.set(0,0,0);
         resolve(model);
     }
 

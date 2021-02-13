@@ -40,9 +40,16 @@ export default class CharacterStateMachine{
       this._switchCurrentActionTo(stateToSet._action);
       this._currentState = stateToSet;
       this._currentState.enter(prevState);
+      prevState._accelerationFactor=0.1;
     }
   
     update(timeElapsed, input) {
+      const {arrowLeft,arrowRight} =input.keyPressed;
+      const {rotation}=this._character.model;
+
+      if(arrowLeft) rotation.y+=Math.PI/120;
+      if(arrowRight) rotation.y-=Math.PI/120;
+
       if (this._currentState) {
         this._currentState.update(timeElapsed, input);
       }

@@ -1,4 +1,5 @@
 import State from '/modules/states/State.js';
+import * as THREE from '/build/three.module.js';
 
 export default class WalkingState extends State{
     constructor(parent,action){
@@ -8,9 +9,18 @@ export default class WalkingState extends State{
     enter(previousState){
         console.log('walking...');
         const {position}=this._parent._character.model;
-        position.x+=0.01;
-        position.z+=0.01;
+        const {rotation}=this._parent._character.model;
 
+        if(this._accelerationFactor<=1) this._accelerationFactor+=0.01;
+
+        const vector=new THREE.Vector3(
+                Math.sin(rotation.y),
+                0,
+                Math.cos(rotation.y),
+            )
+            .multiplyScalar(0.05)
+            .multiplyScalar(this._accelerationFactor);
+        position.add(vector);
     }
 
     exit(){}

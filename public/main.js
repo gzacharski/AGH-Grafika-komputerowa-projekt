@@ -5,19 +5,19 @@ import {OrbitControls} from '/jsm/controls/OrbitControls.js';
 import Stats from '/jsm/libs/stats.module.js';
 import * as dat from '/jsm/libs/dat.gui.module.js';
 import Character from '/modules/Character.js';
-import TestCharacter from '/modules/TestCharacter.js';
+import Camera from '../modules/Camera.js';
 
 const clock = new THREE.Clock();
 let stats;
 
 //three.js variables
-let scene, camera, renderer, material;
+let scene, camera, renderer, material, thirdPersonCamera;
 
 //cannon.js variables
 let world, controls, sphereShape,sphereBody, physicsMaterial;
 
 //models
-let character,testCharacter={status:false};
+let character={status:false};
 
 const root=document.getElementById('root');
 
@@ -26,13 +26,9 @@ axesHelper();
 initCannon();
 initPointerLock();
 addStats();
-//initCharacter();
-
-//test
-initTestCharacter();
-
+initCharacter();
+// initThirdPersonCamera();
 animate();
-
 
 
 function initThree(){
@@ -54,7 +50,7 @@ function initThree(){
     document.body.appendChild(stats.dom);
 
     // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.1)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
     scene.add(ambientLight)
 
     const spotlight = new THREE.SpotLight(0xffffff, 0.9, 0, Math.PI / 4, 1)
@@ -72,6 +68,23 @@ function initThree(){
     spotlight.shadow.mapSize.height = 2048
 
     scene.add(spotlight)
+
+    // let light = new THREE.DirectionalLight(0xEEEEEE, 1.0);
+    // light.position.set(-100, 100, 100);
+    // light.target.position.set(0, 0, 0);
+    // light.castShadow = true;
+    // light.shadow.bias = -0.001;
+    // light.shadow.mapSize.width = 4096;
+    // light.shadow.mapSize.height = 4096;
+    // light.shadow.camera.near = 0.1;
+    // light.shadow.camera.far = 500.0;
+    // light.shadow.camera.near = 0.5;
+    // light.shadow.camera.far = 500.0;
+    // light.shadow.camera.left = 50;
+    // light.shadow.camera.right = -50;
+    // light.shadow.camera.top = 50;
+    // light.shadow.camera.bottom = -50;
+    // scene.add(light);
 
     // Generic material
     material = new THREE.MeshLambertMaterial({ color: 0xdddddd })
@@ -140,6 +153,7 @@ function initCannon(){
 function initPointerLock() {
     //controls = new PointerLockControlsCannon(camera, sphereBody);
     controls = new OrbitControls( camera, renderer.domElement );
+    controls.enabled=false;
     camera.position.set(5,5,10);
     controls.listenToKeyEvents( window );
     
@@ -175,24 +189,22 @@ function addStats(){
 }
 
 function initCharacter(){
-    new Character('ninja',camera,controls)
-        .getCharacter()
-        .then(theCharacter=>{
-            character=theCharacter;
-            scene.add(character.model);
+    character=new Character('ninja');
+    
+    character.getCharacter().then(theCharacter=>{
+            character._character=theCharacter;
+            scene.add(character._character.model);
+            character.status=true;
+            console.log(character);
         })
         .catch(error=>console.log(error));
 }
 
-function initTestCharacter(){
-    testCharacter=new TestCharacter('ninja');
-    
-    testCharacter.getCharacter().then(theCharacter=>{
-            testCharacter._character=theCharacter;
-            scene.add(testCharacter._character.model);
-            testCharacter.status=true;
-        })
-        .catch(error=>console.log(error));
+function initThirdPersonCamera(){
+    thirdPersonCamera=new Camera({
+        camera,
+        target: controls
+    });
 }
 
 function animate() {
@@ -204,13 +216,14 @@ function animate() {
 
     var delta = clock.getDelta();
 
-    if(character){
-        controls.target=character.model.position;
-        character.mixer.update(delta);
+    if(character.status){
+        controls.target=character._character.model.position;
+        camera.position.set(5,5,10);
+        character._character.mixer.update(delta);
+        character.update(delta);
     }
 
-    if(testCharacter.status){
-        testCharacter._character.mixer.update(delta);
-        testCharacter.update(delta);
+    if(thirdPersonCamera){
+        thirdPersonCamera.update(delta);
     }
 };
