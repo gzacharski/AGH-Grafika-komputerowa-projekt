@@ -1,12 +1,8 @@
 import State from '/modules/states/State.js';
 
 export default class JumpInRunState extends State{
-    constructor(parent){
-        super(parent);
-    }
-
-    get name(){
-        return 'jumpInRun';
+    constructor(parent,action){
+        super(parent,action);
     }
 
     enter(previousState){

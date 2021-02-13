@@ -1,12 +1,8 @@
 import State from '/modules/states/State.js';
 
 export default class RightStrafeWalkingState extends State{
-    constructor(parent){
-        super(parent);
-    }
-
-    get name(){
-        return 'rightStrafeWalking';
+    constructor(parent,action){
+        super(parent,action);
     }
 
     enter(previousState){

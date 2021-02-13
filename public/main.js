@@ -17,7 +17,7 @@ let scene, camera, renderer, material;
 let world, controls, sphereShape,sphereBody, physicsMaterial;
 
 //models
-let character;
+let character,testCharacter={status:false};
 
 const root=document.getElementById('root');
 
@@ -26,9 +26,10 @@ axesHelper();
 initCannon();
 initPointerLock();
 addStats();
-initCharacter();
+//initCharacter();
 
-let testCharacter=new TestCharacter();
+//test
+initTestCharacter();
 
 animate();
 
@@ -183,6 +184,17 @@ function initCharacter(){
         .catch(error=>console.log(error));
 }
 
+function initTestCharacter(){
+    testCharacter=new TestCharacter('ninja');
+    
+    testCharacter.getCharacter().then(theCharacter=>{
+            testCharacter._character=theCharacter;
+            scene.add(testCharacter._character.model);
+            testCharacter.status=true;
+        })
+        .catch(error=>console.log(error));
+}
+
 function animate() {
     requestAnimationFrame(animate);
 
@@ -197,8 +209,8 @@ function animate() {
         character.mixer.update(delta);
     }
 
-    if(testCharacter){
+    if(testCharacter.status){
+        testCharacter._character.mixer.update(delta);
         testCharacter.update(delta);
     }
-
 };

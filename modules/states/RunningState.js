@@ -1,12 +1,8 @@
 import State from '/modules/states/State.js';
 
 export default class RunningState extends State{
-    constructor(parent){
-        super(parent);
-    }
-
-    get name(){
-        return 'running';
+    constructor(parent,action){
+        super(parent,action);
     }
 
     enter(previousState){

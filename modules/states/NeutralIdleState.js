@@ -1,16 +1,14 @@
 import State from '/modules/states/State.js';
 
 export default class NeutralIdleState extends State{
-    constructor(parent){
-        super(parent);
-    }
-
-    get name(){
-        return 'neutralIdle';
+    constructor(parent,action){
+        super(parent,action);
     }
 
     enter(previousState){
         console.log('neutralIdle...');
+
+
         // const currentAction=this._parent._proxy._animations['neutralIdle'].action;
 
         // if(previousState){
@@ -23,7 +21,7 @@ export default class NeutralIdleState extends State{
         //     currentAction.crossFadeFrom( previousAction, this._duration, true );
         //     currentAction.play();
         // }else{
-        //     idleAction.play();
+        //     currentAction.play();
         // }
     }
 
