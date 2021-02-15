@@ -7,6 +7,7 @@ import RunningState from '/modules/states/RunningState.js';
 import WalkingBackwardsState from '/modules/states/WalkingBackwardsState.js';
 import WalkingState from '/modules/states/WalkingState.js';
 import AnimationController from '/modules/controllers/AnimationController.js';
+import HookPunchState from '/modules/states/HookPunchState.js';
 
 export default class CharacterStateMachine{
 
@@ -14,6 +15,7 @@ export default class CharacterStateMachine{
         this._canSwitchAnimation=true;
         this._character=character;
         this._states = {
+          hookPunch: new HookPunchState(this,this._character.actions.HookPunch),
           jumpInIdle : new JumpInIdleState(this,this._character.actions.JumpInIdle),
           jumpInRun : new JumpInRunState(this,this._character.actions.JumpInRun),
           leftStrafeWalking : new LeftStrafeWalkingState(this,this._character.actions.LeftStrafeWalking),

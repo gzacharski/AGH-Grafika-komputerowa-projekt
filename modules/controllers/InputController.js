@@ -50,7 +50,7 @@ export default class InputController {
     }
 
     _onClick=()=>{
-        this._keyboard.leftClick=true;
+        this.keyPressed.leftClick=true;
     }
 
     _onRightClick=(event)=>{

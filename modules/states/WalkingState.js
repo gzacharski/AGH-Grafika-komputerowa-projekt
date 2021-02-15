@@ -26,10 +26,15 @@ export default class WalkingState extends State{
     exit(){}
 
     update(timeElapsed,input){
-        const {forward,shift,space} =input.keyPressed;
-        const {running,neutralIdle,walking,jumpInRun}=this._parent._states;
+        const {forward,shift,space,leftClick} =input.keyPressed;
+        const {running,neutralIdle,walking,jumpInRun,hookPunch}=this._parent._states;
 
-        if(forward && space){
+        if(leftClick){
+            input.keyPressed.leftClick=false;
+            console.log("from idle to punch");
+            this._parent.setState(hookPunch);
+
+        }else if(forward && space){
             console.log("From walking to jump in run");
             this._parent.setState(jumpInRun);
 

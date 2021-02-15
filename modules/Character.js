@@ -12,7 +12,8 @@ const animations=[
     'RightStrafeWalking',
     'JumpInIdle',
     'JumpInRun',
-    'Running'
+    'Running',
+    'HookPunch'
 ];
 
 const clock = new THREE.Clock();

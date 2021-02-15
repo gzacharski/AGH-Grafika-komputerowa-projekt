@@ -19,11 +19,7 @@ let world, sphereShape,sphereBody, physicsMaterial;
 let character={status:false};
 
 const root=document.getElementById('root');
-root.addEventListener('click', () => {
-    console.log("clicked..")
-    //controls.lock();
-    root.style.display = 'none';
-})
+root.addEventListener('click', () => root.style.display = 'none');
 
 initThree();
 axesHelper();
