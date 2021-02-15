@@ -1,33 +1,36 @@
 import * as THREE from '/build/three.module.js';
 import * as CANNON from '/cannon-es/dist/cannon-es.js';
-import {OrbitControls} from '/jsm/controls/OrbitControls.js';
 //import {PointerLockControlsCannon} from '/cannon-es/examples/js/PointerLockControlsCannon.js';
 import Stats from '/jsm/libs/stats.module.js';
 import * as dat from '/jsm/libs/dat.gui.module.js';
 import Character from '/modules/Character.js';
-import Camera from '../modules/Camera.js';
+import GameplayCamera from '../modules/GameplayCamera.js';
 
 const clock = new THREE.Clock();
 let stats;
 
 //three.js variables
-let scene, camera, renderer, material, thirdPersonCamera;
+let scene, camera, renderer, material, gameplayCamera;
 
 //cannon.js variables
-let world, controls, sphereShape,sphereBody, physicsMaterial;
+let world, sphereShape,sphereBody, physicsMaterial;
 
 //models
 let character={status:false};
 
 const root=document.getElementById('root');
+root.addEventListener('click', () => {
+    console.log("clicked..")
+    //controls.lock();
+    root.style.display = 'none';
+})
 
 initThree();
 axesHelper();
 initCannon();
-initPointerLock();
 addStats();
 initCharacter();
-// initThirdPersonCamera();
+initGameplayCamera();
 animate();
 
 
@@ -69,23 +72,6 @@ function initThree(){
 
     scene.add(spotlight)
 
-    // let light = new THREE.DirectionalLight(0xEEEEEE, 1.0);
-    // light.position.set(-100, 100, 100);
-    // light.target.position.set(0, 0, 0);
-    // light.castShadow = true;
-    // light.shadow.bias = -0.001;
-    // light.shadow.mapSize.width = 4096;
-    // light.shadow.mapSize.height = 4096;
-    // light.shadow.camera.near = 0.1;
-    // light.shadow.camera.far = 500.0;
-    // light.shadow.camera.near = 0.5;
-    // light.shadow.camera.far = 500.0;
-    // light.shadow.camera.left = 50;
-    // light.shadow.camera.right = -50;
-    // light.shadow.camera.top = 50;
-    // light.shadow.camera.bottom = -50;
-    // scene.add(light);
-
     // Generic material
     material = new THREE.MeshLambertMaterial({ color: 0xdddddd })
 
@@ -102,8 +88,6 @@ function initThree(){
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.render(scene, camera);
     }, false);
-
-
 }
 
 function axesHelper(){
@@ -150,38 +134,6 @@ function initCannon(){
     world.addBody(groundBody);
 }
 
-function initPointerLock() {
-    //controls = new PointerLockControlsCannon(camera, sphereBody);
-    controls = new OrbitControls( camera, renderer.domElement );
-    controls.enabled=false;
-    camera.position.set(5,5,10);
-    controls.listenToKeyEvents( window );
-    
-    controls.minDistance = 3;
-    controls.maxDistance = 5;
-
-    controls.maxPolarAngle = Math.PI / 2-Math.PI / 24;
-    controls.minPolarAngle=Math.PI / 6; 
-
-    //scene.add(controls.getObject())
-
-    root.addEventListener('click', () => {
-        console.log("clicked..")
-        //controls.lock();
-        root.style.display = 'none';
-    })
-
-    controls.addEventListener('lock', () => {
-        //controls.enabled = true
-        root.style.display = 'none'
-    })
-
-    controls.addEventListener('unlock', () => { 
-        //controls.enabled = false
-        root.style.display = null
-    })
-}
-
 function addStats(){
     const gui = new dat.GUI();
     const cam=gui.addFolder('Camera');
@@ -195,59 +147,27 @@ function initCharacter(){
             character._character=theCharacter;
             scene.add(character._character.model);
             character.status=true;
-            console.log(character);
         })
         .catch(error=>console.log(error));
 }
 
-function initThirdPersonCamera(){
-    thirdPersonCamera=new Camera({
+function initGameplayCamera(){
+    gameplayCamera=new GameplayCamera({
+        scene,
+        character,
         camera,
-        target: controls
+        renderer
     });
 }
 
 function animate() {
     requestAnimationFrame(animate);
 
-    controls.update();
     renderer.render(scene, camera);
     stats.update();
 
-    var delta = clock.getDelta();
+    const delta = clock.getDelta();
+    if(character.status) character.update(delta);
 
-    if(character.status){
-        //controls.target=character._character.model.position;
-        const {x,y,z}=character._character.model.position;
-
-        // const newCameraPosition=vector.add(new THREE.Vector3(5,5,10));
-        // console.log(vector);
-        const {rightClick}=character._input.keyPressed;
-        if(rightClick){
-            controls.target=character._character.model.position;
-            camera.position.set(x+3,y+3,z+5);
-        }else{
-            controls.target=new THREE.Vector3(x,y+1,z);
-            const {rotation}=character._character.model;
-
-            const difference=new THREE.Vector3(
-                Math.sin(rotation.y),
-                0.7,
-                0.3*Math.cos(rotation.y),
-            );
-
-            const newCameraPosition=new THREE.Vector3(x,y,z).sub(difference);
-            camera.position.set(newCameraPosition.x,newCameraPosition.y,newCameraPosition.z);
-            //camera.position.set(x,y+0.5,z+0.5);
-        }
-        
-        //camera.position=newCameraPosition;
-        character._character.mixer.update(delta);
-        character.update(delta);
-        //console.log(character._character.model.position);
-    }
-
-    if(thirdPersonCamera){
-        thirdPersonCamera.update(delta);
-    }
+    gameplayCamera.update();
 };

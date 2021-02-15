@@ -81,5 +81,7 @@ export default class Character{
         if(!this._stateMachine._currentState) return;
 
         this._stateMachine.update(timeInSeconds,this._input);
+
+        this._character.mixer.update(timeInSeconds);
     }
 }
