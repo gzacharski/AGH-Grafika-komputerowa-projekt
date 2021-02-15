@@ -29,8 +29,8 @@ export default class GameplayCamera{
         if(this._character.status){
             const {x,y,z}=this._character._character.model.position;
     
-            const {rightClick}=this._character._input.keyPressed;
-            if(rightClick){
+            const {keyC}=this._character._input.keyPressed;
+            if(keyC){
                 this._controls.target=this._character._character.model.position;
                 this._camera.position.set(x+3,y+3,z+5);
             }else{

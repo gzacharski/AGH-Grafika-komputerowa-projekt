@@ -12,7 +12,7 @@ export default class NeutralIdleState extends State{
     exit(){}
     
     update(timeElapsed,input){
-        const { forward, backward, left, right, space, shift,leftClick } = input.keyPressed;
+        const { forward, backward, left, right, space, shift,arrowUp} = input.keyPressed;
         const {
           walking,
           walkingBackwards,
@@ -23,8 +23,7 @@ export default class NeutralIdleState extends State{
           hookPunch
         } = this._parent._states;
 
-        if(leftClick){
-            input.keyPressed.leftClick=false;
+        if(arrowUp){
             console.log("from idle to punch");
             this._parent.setState(hookPunch);
 
