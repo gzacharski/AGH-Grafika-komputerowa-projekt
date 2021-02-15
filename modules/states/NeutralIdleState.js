@@ -12,7 +12,7 @@ export default class NeutralIdleState extends State{
     exit(){}
     
     update(timeElapsed,input){
-        const { forward, backward, left, right, space, shift,arrowUp} = input.keyPressed;
+        const { forward, backward, left, right, space, shift,arrowUp,arrowDown} = input.keyPressed;
         const {
           walking,
           walkingBackwards,
@@ -20,13 +20,19 @@ export default class NeutralIdleState extends State{
           rightStrafeWalking,
           jumpInIdle,
           running,
-          hookPunch
+          hookPunch,
+          bigSideHit,
+          angry
         } = this._parent._states;
 
         if(arrowUp){
             console.log("from idle to punch");
             this._parent.setState(hookPunch);
 
+        }else if(arrowDown){
+            console.log("from idle to bigSideHit");
+            this._parent.setState(bigSideHit);
+        
         }else if(shift && forward){
             console.log("from idle to running");
             this._parent.setState(running);
@@ -50,6 +56,12 @@ export default class NeutralIdleState extends State{
         }else if(space){
             console.log("From idle to jump");
             this._parent.setState(jumpInIdle);
+
+        }else if(this._parent._timeToBeAngry>300){
+            console.log("From idle to jump");
+            this._parent.setState(angry);
+        }else{
+            this._parent._timeToBeAngry+=1;
         }
     }
 }

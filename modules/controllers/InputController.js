@@ -12,6 +12,7 @@ export default class InputController {
             space: false,
             shift: false,
             arrowUp: false,
+            arrowDown: false,
             keyC: false,
             arrowLeft: false,
             arrowRight: false
@@ -39,6 +40,7 @@ export default class InputController {
             if(this._keyboard.pressed("a")) this.keyPressed.left=true;
             if(this._keyboard.pressed("d")) this.keyPressed.right=true;
             if(this._keyboard.pressed("up")) this.keyPressed.arrowUp=true;
+            if(this._keyboard.pressed("down")) this.keyPressed.arrowDown=true;
             if(this._keyboard.pressed("c")) this.keyPressed.keyC=!this.keyPressed.keyC;
         }
     }
@@ -54,6 +56,7 @@ export default class InputController {
             if(!this._keyboard.pressed("d")) this.keyPressed.right=false;
             if(!this._keyboard.pressed("space")) this.keyPressed.space=false;
             if(!this._keyboard.pressed("up")) this.keyPressed.arrowUp=false;
+            if(!this._keyboard.pressed("down")) this.keyPressed.arrowDown=false;
         }
     }
 
