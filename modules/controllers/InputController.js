@@ -53,7 +53,8 @@ export default class InputController {
         this._keyboard.leftClick=true;
     }
 
-    _onRightClick=()=>{
-        this._keyboard.rightClick=true;
+    _onRightClick=(event)=>{
+        event.preventDefault();
+        this.keyPressed.rightClick=!this.keyPressed.rightClick;
     }
 }

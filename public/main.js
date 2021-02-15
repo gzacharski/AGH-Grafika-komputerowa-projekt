@@ -217,10 +217,34 @@ function animate() {
     var delta = clock.getDelta();
 
     if(character.status){
-        controls.target=character._character.model.position;
-        camera.position.set(5,5,10);
+        //controls.target=character._character.model.position;
+        const {x,y,z}=character._character.model.position;
+
+        // const newCameraPosition=vector.add(new THREE.Vector3(5,5,10));
+        // console.log(vector);
+        const {rightClick}=character._input.keyPressed;
+        if(rightClick){
+            controls.target=character._character.model.position;
+            camera.position.set(x+3,y+3,z+5);
+        }else{
+            controls.target=new THREE.Vector3(x,y+1,z);
+            const {rotation}=character._character.model;
+
+            const difference=new THREE.Vector3(
+                Math.sin(rotation.y),
+                0.7,
+                0.3*Math.cos(rotation.y),
+            );
+
+            const newCameraPosition=new THREE.Vector3(x,y,z).sub(difference);
+            camera.position.set(newCameraPosition.x,newCameraPosition.y,newCameraPosition.z);
+            //camera.position.set(x,y+0.5,z+0.5);
+        }
+        
+        //camera.position=newCameraPosition;
         character._character.mixer.update(delta);
         character.update(delta);
+        //console.log(character._character.model.position);
     }
 
     if(thirdPersonCamera){

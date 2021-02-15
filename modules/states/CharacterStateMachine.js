@@ -44,11 +44,11 @@ export default class CharacterStateMachine{
     }
   
     update(timeElapsed, input) {
-      const {arrowLeft,arrowRight} =input.keyPressed;
+      const {arrowLeft,arrowRight,forward,backward} =input.keyPressed;
       const {rotation}=this._character.model;
 
-      if(arrowLeft) rotation.y+=Math.PI/120;
-      if(arrowRight) rotation.y-=Math.PI/120;
+      if(arrowLeft && forward || arrowRight && backward) rotation.y+=Math.PI/180;
+      if(arrowRight && forward|| arrowLeft && backward) rotation.y-=Math.PI/180;
 
       if (this._currentState) {
         this._currentState.update(timeElapsed, input);
