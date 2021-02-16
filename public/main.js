@@ -6,6 +6,7 @@ import * as dat from '/jsm/libs/dat.gui.module.js';
 import Character from '/modules/Character.js';
 import GameplayCamera from '/modules/GameplayCamera.js';
 import PlantLoader from '/modules/loaders/PlantLoader.js';
+import WoodBox from '/modules/WoodBox.js'
 
 const clock = new THREE.Clock();
 clock.start();
@@ -35,7 +36,8 @@ addStats();
 initCharacter();
 initGameplayCamera();
 addSkyBox();
-addPlants();
+//addPlants();
+addWoodBox();
 animate();
 
 
@@ -234,4 +236,9 @@ function addTreeModelToScene(model,tree){
     model.rotation.y = tree.rotation;
     model.position.set(tree.x,tree.y,tree.z);
     scene.add(model)
+}
+
+function addWoodBox(){
+    const woodBox=new WoodBox(5,{x:-5,y:0.5,z:-5}).box;
+    scene.add(woodBox);
 }
