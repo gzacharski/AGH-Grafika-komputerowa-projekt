@@ -31,6 +31,8 @@ initCannon();
 addStats();
 initCharacter();
 initGameplayCamera();
+addSkyBox();
+addPlaneHelper();
 animate();
 
 
@@ -53,7 +55,7 @@ function initThree(){
     document.body.appendChild(stats.dom);
 
     // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
     scene.add(ambientLight)
 
     const spotlight = new THREE.SpotLight(0xffffff, 0.9, 0, Math.PI / 4, 1)
@@ -73,11 +75,20 @@ function initThree(){
     scene.add(spotlight)
 
     // Generic material
-    material = new THREE.MeshLambertMaterial({ color: 0xdddddd })
+    material = new THREE.MeshLambertMaterial()
+    const texture = new THREE.TextureLoader().load( "/textures/grasslight-big.jpg" );
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set( 1000, 1000);
+    texture.anisotropy=16;
+    texture.encoding=THREE.sRGBEncoding;
+    material.map=texture;
+    material.magFilter=THREE.NearestFilter;
 
     // Floor
-    const floorGeometry = new THREE.PlaneBufferGeometry(300, 300, 100, 100)
-    floorGeometry.rotateX(-Math.PI / 2)
+    const floorGeometry = new THREE.PlaneBufferGeometry(3000, 3000, 1000, 1000)
+    floorGeometry.rotateX(-Math.PI / 2);
+
     const floor = new THREE.Mesh(floorGeometry, material)
     floor.receiveShadow = true
     scene.add(floor)
@@ -160,6 +171,19 @@ function initGameplayCamera(){
     });
 }
 
+function addSkyBox(){
+    scene.background= new THREE.CubeTextureLoader()
+        .setPath( '/textures/')
+        .load([
+            'meadow_rt.jpg',
+            'meadow_lf.jpg',
+            'meadow_up.jpg',
+            'meadow_dn.jpg',
+            'meadow_bk.jpg',
+            'meadow_ft.jpg',
+        ]);
+}
+
 function animate() {
     requestAnimationFrame(animate);
 
@@ -171,3 +195,9 @@ function animate() {
 
     gameplayCamera.update();
 };
+
+function addPlaneHelper(){
+    const plane = new THREE.Plane( new THREE.Vector3( 1, 1, 0.2 ), 3 );
+    const helper = new THREE.PlaneHelper( plane, 1, 0xffff00 );
+    scene.add( helper );
+}
