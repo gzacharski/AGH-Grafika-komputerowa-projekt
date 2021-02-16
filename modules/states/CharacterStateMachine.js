@@ -10,6 +10,7 @@ import AnimationController from '/modules/controllers/AnimationController.js';
 import HookPunchState from '/modules/states/HookPunchState.js';
 import AngryState from '/modules/states/AngryState.js';
 import BigSideHitState from '/modules/states/BigSideHitState.js';
+import YawnState from '/modules/states/YawnState.js';
 
 export default class CharacterStateMachine{
 
@@ -18,7 +19,7 @@ export default class CharacterStateMachine{
         this._character=character;
         this._states = {
           angry : new AngryState(this,this._character.actions.Angry),
-          bigSideHit: new AngryState(this,this._character.actions.BigSideHit),
+          bigSideHit: new BigSideHitState(this,this._character.actions.BigSideHit),
           hookPunch: new HookPunchState(this,this._character.actions.HookPunch),
           jumpInIdle : new JumpInIdleState(this,this._character.actions.JumpInIdle),
           jumpInRun : new JumpInRunState(this,this._character.actions.JumpInRun),
@@ -28,14 +29,13 @@ export default class CharacterStateMachine{
           running : new RunningState(this,this._character.actions.Running),
           walkingBackwards : new WalkingBackwardsState(this,this._character.actions.WalkingBackwards),
           walking : new WalkingState(this,this._character.actions.Walking),
+          yawn : new YawnState(this,this._character.actions.Yawn)
         };
         this._currentState = this._states.neutralIdle;
         this._animationController=new AnimationController(this);
-        this._timeToBeAngry=0;
     }
 
     setState(stateToSet) {
-      this._timeToBeAngry=0;
       const prevState = this._currentState;
 
       if (prevState == stateToSet){
