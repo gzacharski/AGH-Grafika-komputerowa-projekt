@@ -4,7 +4,8 @@ import * as CANNON from '/cannon-es/dist/cannon-es.js';
 import Stats from '/jsm/libs/stats.module.js';
 import * as dat from '/jsm/libs/dat.gui.module.js';
 import Character from '/modules/Character.js';
-import GameplayCamera from '../modules/GameplayCamera.js';
+import GameplayCamera from '/modules/GameplayCamera.js';
+import PlantLoader from '/modules/loaders/PlantLoader.js';
 
 const clock = new THREE.Clock();
 clock.start();
@@ -15,6 +16,8 @@ let scene, camera, renderer, material, gameplayCamera;
 
 //cannon.js variables
 let world, sphereShape,sphereBody, physicsMaterial;
+
+let tree;
 
 //models
 let character={status:false};
@@ -32,7 +35,7 @@ addStats();
 initCharacter();
 initGameplayCamera();
 addSkyBox();
-addPlaneHelper();
+addPlants();
 animate();
 
 
@@ -196,8 +199,39 @@ function animate() {
     gameplayCamera.update();
 };
 
-function addPlaneHelper(){
-    const plane = new THREE.Plane( new THREE.Vector3( 1, 1, 0.2 ), 3 );
-    const helper = new THREE.PlaneHelper( plane, 1, 0xffff00 );
-    scene.add( helper );
+function addPlants(){
+
+    let deciduousTreesPositions=[
+        { x: 10, y: 0, z: 10, rotation: Math.PI, scale: 0.75 },
+        { x: -10, y: 0, z: -10, rotation: -Math.PI, scale: 2.0 },
+        { x: -10, y: 0, z: 0, rotation: Math.PI / 2, scale: 1.5 },
+        { x: 0, y: 0, z: -10, rotation: Math.PI / 2, scale: 1.2 },
+    ];
+
+    let conifersTreePositions=[
+        {x:30,y:0,z:30,rotation:Math.PI, scale: 1.2 },
+        {x:-30,y:0,z:40,rotation:Math.PI/2, scale: 3 },
+        {x:-30,y:0,z:-50,rotation:Math.PI/2, scale: 3 },
+    ];
+    
+    deciduousTreesPositions.forEach(tree=>{
+        new PlantLoader("realistic_trees1")
+            .getPlant()
+            .then(model=>addTreeModelToScene(model,tree))
+            .catch(error=>console.log(error));
+    })
+
+    conifersTreePositions.forEach(tree=>{
+        new PlantLoader("realistic_trees2")
+            .getPlant()
+            .then(model=>addTreeModelToScene(model,tree))
+            .catch(error=>console.log(error));
+    })
+}
+
+function addTreeModelToScene(model,tree){
+    model.scale.multiplyScalar(tree.scale);
+    model.rotation.y = tree.rotation;
+    model.position.set(tree.x,tree.y,tree.z);
+    scene.add(model)
 }
