@@ -27,6 +27,7 @@ export default class InputController {
 
     _onKeyDown=()=>{
         if(!this.disabled){
+            if(this._keyboard.pressed("c")) this.keyPressed.keyC=!this.keyPressed.keyC;
             if(this._keyboard.pressed("left")) this.keyPressed.arrowLeft=true;
             if(this._keyboard.pressed("right")) this.keyPressed.arrowRight=true;
             if(this._keyboard.pressed("space")) this.keyPressed.space=true;
@@ -41,7 +42,6 @@ export default class InputController {
             if(this._keyboard.pressed("d")) this.keyPressed.right=true;
             if(this._keyboard.pressed("up")) this.keyPressed.arrowUp=true;
             if(this._keyboard.pressed("down")) this.keyPressed.arrowDown=true;
-            if(this._keyboard.pressed("c")) this.keyPressed.keyC=!this.keyPressed.keyC;
         }
     }
 

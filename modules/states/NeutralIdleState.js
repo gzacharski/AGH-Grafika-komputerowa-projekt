@@ -1,12 +1,16 @@
 import State from '/modules/states/State.js';
+import * as THREE from '/build/three.module.js';
 
 export default class NeutralIdleState extends State{
     constructor(parent,action){
         super(parent,action);
+        this._clock=new THREE.Clock();
+        this._timeElapsedToGetAngry=6; //in seconds
     }
 
     enter(previousState){
         console.log('neutralIdle...');
+        this._clock.start();
     }
 
     exit(){}
@@ -22,7 +26,7 @@ export default class NeutralIdleState extends State{
           running,
           hookPunch,
           bigSideHit,
-          angry
+          yawn
         } = this._parent._states;
 
         if(arrowUp){
@@ -57,11 +61,9 @@ export default class NeutralIdleState extends State{
             console.log("From idle to jump");
             this._parent.setState(jumpInIdle);
 
-        }else if(this._parent._timeToBeAngry>300){
-            console.log("From idle to jump");
-            this._parent.setState(angry);
-        }else{
-            this._parent._timeToBeAngry+=1;
+        }else if(this._clock.getElapsedTime()>this._timeElapsedToGetAngry){
+            console.log("From idle to yawning");
+            this._parent.setState(yawn);
         }
     }
 }

@@ -7,6 +7,7 @@ import Character from '/modules/Character.js';
 import GameplayCamera from '../modules/GameplayCamera.js';
 
 const clock = new THREE.Clock();
+clock.start();
 let stats;
 
 //three.js variables
