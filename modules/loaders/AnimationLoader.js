@@ -21,7 +21,7 @@ export default class AnimationLoader {
         return new Promise((resolve,reject)=>{
             loader.loadAsync(`${name}.fbx`,animation=>this._onLoading(animation,name))
                 .then(animation=>this._afterLoaded(animation,name,resolve))
-                .catch(animation=>this._onError(animation,reject))
+                .catch(()=>this._onError(reject))
                 .finally(this._onFinally)
         });
     }

@@ -12,7 +12,7 @@ export default class CharacterLoader{
 
             loader.loadAsync(`${fileName}.fbx`,this._onLoading)
                 .then(model=>this._afterLoaded(model,resolve))
-                .catch(model=>this._onError(model,reject))
+                .catch(()=>this._onError(reject))
                 .finally(this._onFinally);
         });
     }

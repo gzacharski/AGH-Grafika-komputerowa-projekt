@@ -40,7 +40,6 @@ export default class Yawn extends State{
 
         }else if(this._clock.getElapsedTime()>this._action._clip.duration){
             console.log("From yawning to being angry");
-            console.log(this._clock);
 
             const {angry}=this._parent._states;
             this._parent.setState(angry);
