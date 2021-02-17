@@ -6,11 +6,11 @@ export default class BigSideHit extends State{
     }
 
     enter(prevState){
-        console.log('Being angry ...');
+        //console.log('Being angry ...');
         
         setTimeout(
             ()=>{
-                console.log("From being Angry to idle");
+                //console.log("From being Angry to idle");
                 const {neutralIdle,walking}=this._parent._states;
 
                 if(prevState===neutralIdle){

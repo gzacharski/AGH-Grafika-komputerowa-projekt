@@ -6,11 +6,11 @@ export default class HookPunch extends State{
     }
 
     enter(prevState){
-        console.log('HookPunch ...');
+        //console.log('HookPunch ...');
         
         setTimeout(
             ()=>{
-                console.log("From HookPunch to idle");
+                //console.log("From HookPunch to idle");
                 const {neutralIdle,walking}=this._parent._states;
 
                 if(prevState===neutralIdle){

@@ -7,8 +7,8 @@ export default class LeftStrafeWalkingState extends State{
     }
 
     enter(previousState){
-        console.log('leftStrafeWalking...');
-        const {position}=this._parent._character.model;
+        //console.log('leftStrafeWalking...');
+        const {position}=this._parent._character.body;
         const {rotation}=this._parent._character.model;
 
         if(this._accelerationFactor<=1) this._accelerationFactor+=0.01;
@@ -20,7 +20,11 @@ export default class LeftStrafeWalkingState extends State{
             )
             .multiplyScalar(0.05)
             .multiplyScalar(this._accelerationFactor);
-        position.add(vector);
+
+        let tempVector=new THREE.Vector3(position.x,position.y,position.z);
+        tempVector.add(vector);
+        const {x,y,z}=tempVector;
+        this._parent._character.body.position.set(x,y,z);
     }
 
     exit(){}
@@ -30,9 +34,10 @@ export default class LeftStrafeWalkingState extends State{
         const {neutralIdle,leftStrafeWalking}=this._parent._states;
 
         if(!left){
-            console.log("From left to idle");
+            //console.log("From left to idle");
             this._accelerationFactor=0.1;
             this._parent.setState(neutralIdle);
+
         }else{
             this._parent.setState(leftStrafeWalking);
         }

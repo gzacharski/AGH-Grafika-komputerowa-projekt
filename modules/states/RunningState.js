@@ -7,8 +7,8 @@ export default class RunningState extends State{
     }
 
     enter(previousState){
-        console.log('running...');
-        const {position}=this._parent._character.model;
+        //console.log('running...');
+        const {position}=this._parent._character.body;
         const {rotation}=this._parent._character.model;
 
         if(this._accelerationFactor<=1) this._accelerationFactor+=0.01;
@@ -20,7 +20,11 @@ export default class RunningState extends State{
             )
             .multiplyScalar(0.1)
             .multiplyScalar(this._accelerationFactor);
-        position.add(vector);
+        
+        let tempVector=new THREE.Vector3(position.x,position.y,position.z);
+        tempVector.add(vector);
+        const {x,y,z}=tempVector;
+        this._parent._character.body.position.set(x,y,z);
     }
 
     exit(){}
@@ -30,16 +34,17 @@ export default class RunningState extends State{
         const {neutralIdle,walking,jumpInRun,running}=this._parent._states;
         
         if(forward && shift && space){
-            console.log("From walking to jump in run");
+            //console.log("From walking to jump in run");
             this._parent.setState(jumpInRun);
 
         }else if(forward && !shift){
-            console.log("From running to walking");
+            //console.log("From running to walking");
             this._parent.setState(walking);
 
         }else if(!forward){
-            console.log("From running to idle");
+            //console.log("From running to idle");
             this._parent.setState(neutralIdle);
+
         }else{
             this._parent.setState(running);
         }

@@ -8,7 +8,7 @@ export default class Yawn extends State{
     }
 
     enter(){
-        console.log('Yawning ...');
+        //console.log('Yawning ...');
         this._clock.start();
     }
 
@@ -31,15 +31,15 @@ export default class Yawn extends State{
         const {neutralIdle,jumpInIdle}=this._parent._states;
 
         if(forward|| backward ||left || right || arrowUp || arrowDown || arrowLeft|| arrowRight ){
-            console.log("From yawning to idle");
+            //console.log("From yawning to idle");
             this._parent.setState(neutralIdle);
 
         }else if(space){
-            console.log("From yawning to jump");
+            //console.log("From yawning to jump");
             this._parent.setState(jumpInIdle);
 
         }else if(this._clock.getElapsedTime()>this._action._clip.duration){
-            console.log("From yawning to being angry");
+            //console.log("From yawning to being angry");
 
             const {angry}=this._parent._states;
             this._parent.setState(angry);

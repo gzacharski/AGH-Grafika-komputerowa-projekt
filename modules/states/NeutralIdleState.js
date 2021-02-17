@@ -9,7 +9,7 @@ export default class NeutralIdleState extends State{
     }
 
     enter(previousState){
-        console.log('neutralIdle...');
+        //console.log('neutralIdle...');
         this._clock.start();
     }
 
@@ -30,39 +30,39 @@ export default class NeutralIdleState extends State{
         } = this._parent._states;
 
         if(arrowUp){
-            console.log("from idle to punch");
+            //console.log("from idle to punch");
             this._parent.setState(hookPunch);
 
         }else if(arrowDown){
-            console.log("from idle to bigSideHit");
+            //console.log("from idle to bigSideHit");
             this._parent.setState(bigSideHit);
         
         }else if(shift && forward){
-            console.log("from idle to running");
+            //console.log("from idle to running");
             this._parent.setState(running);
 
         }else if(forward){
-            console.log("from idle to walking");
+            //console.log("from idle to walking");
             this._parent.setState(walking);
 
         }else if(backward){
-            console.log("from idle to walkingbackwards");
+            //console.log("from idle to walkingbackwards");
             this._parent.setState(walkingBackwards)
 
         }else if(left){
-            console.log("From idle to left");
+            //console.log("From idle to left");
             this._parent.setState(leftStrafeWalking);
 
         }else if(right){
-            console.log("From idle to right");
+            //console.log("From idle to right");
             this._parent.setState(rightStrafeWalking);
 
         }else if(space){
-            console.log("From idle to jump");
+            //console.log("From idle to jump");
             this._parent.setState(jumpInIdle);
 
         }else if(this._clock.getElapsedTime()>this._timeElapsedToGetAngry){
-            console.log("From idle to yawning");
+            //console.log("From idle to yawning");
             this._parent.setState(yawn);
         }
     }

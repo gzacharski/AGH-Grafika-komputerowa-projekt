@@ -6,7 +6,7 @@ export default class Angry extends State{
     }
 
     enter(){
-        console.log('Being angry ...');
+        //console.log('Being angry ...');
     }
 
     exit(){}
@@ -28,11 +28,11 @@ export default class Angry extends State{
         const {neutralIdle,jumpInIdle}=this._parent._states;
 
         if(forward|| backward ||left || right || arrowUp || arrowDown || arrowLeft|| arrowRight ){
-            console.log("From being angry to idle");
+            //console.log("From being angry to idle");
             this._parent.setState(neutralIdle);
 
         }else if(space){
-            console.log("From being angry to jump");
+            //console.log("From being angry to jump");
             this._parent.setState(jumpInIdle);
         }
 

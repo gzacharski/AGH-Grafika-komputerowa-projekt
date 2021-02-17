@@ -3,6 +3,7 @@ import AnimationLoader from '/modules/loaders/AnimationLoader.js';
 import * as THREE from '/build/three.module.js';
 import InputController from '/modules/controllers/InputController.js';
 import CharacterStateMachine from '/modules/states/CharacterStateMachine.js';
+import * as CANNON from '/cannon-es/dist/cannon-es.js';
 
 const animations=[
     'NeutralIdle',
@@ -21,15 +22,17 @@ const animations=[
 
 const clock = new THREE.Clock();
 
+const bodySize=0.5;
+
 export default class Character{
 
-    constructor(name){
+    constructor(name,physicsMaterial){
         this._input=new InputController();
         this._stateMachine;
-        this._character=this._init(name);
+        this._character=this._init(name,physicsMaterial);
     }
 
-    async _init(name){
+    async _init(name,physicsMaterial){
         try{
             const animationLoader=new AnimationLoader(animations);
             const anims=animationLoader.getAnimations()
@@ -66,6 +69,7 @@ export default class Character{
                 actions,
                 mixer: tempMixer,
                 model: tempModel,
+                body : this._initBody(physicsMaterial)
             }
 
             this._stateMachine=new CharacterStateMachine(tempCharacter);
@@ -77,11 +81,25 @@ export default class Character{
         }
     }
 
+    _initBody(physicsMaterial){
+        const size=new CANNON.Vec3(bodySize,bodySize,bodySize)
+        const shape=new CANNON.Box(size);
+        const body=new CANNON.Body({mass: 5, matw0erial: physicsMaterial});
+
+        body.position.set(0,bodySize,0);
+        body.addShape(shape);
+
+        return body;
+    }
+
     getCharacter(){
         return this._character;
     }
 
     update(timeInSeconds){
+        const {x,y,z}=this._character.body.position;
+        this._character.model.position.set(x,y-bodySize,z);
+        
         if(!this._stateMachine._currentState) return;
 
         this._stateMachine.update(timeInSeconds,this._input);
