@@ -6,7 +6,7 @@ import * as dat from '/jsm/libs/dat.gui.module.js';
 import Character from '/modules/Character.js';
 import GameplayCamera from '/modules/GameplayCamera.js';
 import PlantLoader from '/modules/loaders/PlantLoader.js';
-import WoodBox from '/modules/WoodBox.js'
+import WoodBox from '/modules/WoodBox.js';
 
 const clock = new THREE.Clock();
 clock.start();
@@ -16,7 +16,7 @@ let stats;
 let scene, camera, renderer, material, gameplayCamera;
 
 //cannon.js variables
-let world, sphereShape,sphereBody, physicsMaterial;
+let world, sphereShape,sphereBody, physicsMaterial, woodBox;
 
 let tree;
 
@@ -27,18 +27,22 @@ const root=document.getElementById('root');
 document.addEventListener('click', () => {
     root.style.display = 'none';
     character._input.disabled=false;
+
+    console.log(character._character.body);
+    console.log(character._character.model);
 });
 
 initThree();
 axesHelper();
 initCannon();
-addStats();
 initCharacter();
 initGameplayCamera();
 addSkyBox();
-//addPlants();
+addPlants();
 addWoodBox();
+
 animate();
+
 
 
 function initThree(){
@@ -95,7 +99,8 @@ function initThree(){
     floorGeometry.rotateX(-Math.PI / 2);
 
     const floor = new THREE.Mesh(floorGeometry, material)
-    floor.receiveShadow = true
+    floor.receiveShadow = true;
+    console.log(floor);
     scene.add(floor)
 
     window.addEventListener('resize', () => {
@@ -123,45 +128,33 @@ function initCannon(){
     solver.tolerance = 0.1
     world.solver = new CANNON.SplitSolver(solver)
 
-    world.gravity.set(0, -50, 0)
+    world.gravity.set(0, -10, 0)
 
     physicsMaterial = new CANNON.Material('physics')
     const physics_physics = new CANNON.ContactMaterial(physicsMaterial, physicsMaterial, {
-      friction: 0.0,
+      friction: 0.1,
       restitution: 0.3,
     })
 
     world.addContactMaterial(physics_physics);
-
-    //user collision sphere
-    const radius = 1.3
-    sphereShape = new CANNON.Sphere(radius)
-    sphereBody = new CANNON.Body({ mass: 5, material: physicsMaterial })
-    sphereBody.addShape(sphereShape)
-    sphereBody.position.set(0, 1.3,3)
-    sphereBody.linearDamping = 0.9
-    world.addBody(sphereBody);
 
     //ground physics
     const groundShape=new CANNON.Plane();
     const groundBody=new CANNON.Body({mass: 0, material: physicsMaterial})
     groundBody.addShape(groundShape);
     groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+    console.log(groundBody);
     world.addBody(groundBody);
 }
 
-function addStats(){
-    const gui = new dat.GUI();
-    const cam=gui.addFolder('Camera');
-    cam.add(camera.position, 'x').getValue();
-}
-
 function initCharacter(){
-    character=new Character('ninja');
+    character=new Character('ninja',physicsMaterial);
     
     character.getCharacter().then(theCharacter=>{
+            console.log(theCharacter);
             character._character=theCharacter;
             scene.add(character._character.model);
+            world.addBody(character._character.body);
             character.status=true;
         })
         .catch(error=>console.log(error));
@@ -196,9 +189,14 @@ function animate() {
     stats.update();
 
     const delta = clock.getDelta();
-    if(character.status) character.update(delta);
+    if(character.status){
+        character.update(delta);
+        woodBox.update();
+    } 
 
     gameplayCamera.update();
+    world.step(1/60);
+    
 };
 
 function addPlants(){
@@ -239,6 +237,14 @@ function addTreeModelToScene(model,tree){
 }
 
 function addWoodBox(){
-    const woodBox=new WoodBox(5,{x:-5,y:0.5,z:-5}).box;
-    scene.add(woodBox);
+    woodBox=new WoodBox({
+        world,
+        scene,
+        position: {
+            x:5,
+            z:-5
+        },
+        size: 2,
+        physicsMaterial
+    });
 }
