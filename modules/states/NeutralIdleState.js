@@ -26,7 +26,10 @@ export default class NeutralIdleState extends State{
           running,
           hookPunch,
           bigSideHit,
-          yawn
+          yawn,
+          bashful,
+          bored,
+          happyIdle
         } = this._parent._states;
 
         if(arrowUp){
@@ -62,8 +65,11 @@ export default class NeutralIdleState extends State{
             this._parent.setState(jumpInIdle);
 
         }else if(this._clock.getElapsedTime()>this._timeElapsedToGetAngry){
-            //console.log("From idle to yawning");
-            this._parent.setState(yawn);
+            //console.log("From idle to random boredState");
+            let boredStates=[yawn,bashful,bored,happyIdle];
+            const randomNumber=Math.floor(Math.random()*boredStates.length);
+            
+            this._parent.setState(boredStates[randomNumber]);
         }
     }
 }

@@ -17,7 +17,10 @@ const animations=[
     'HookPunch',
     'Angry',
     'BigSideHit',
-    'Yawn'
+    'Yawn',
+    'Bashful',
+    'Bored',
+    'HappyIdle'
 ];
 
 const clock = new THREE.Clock();
