@@ -26,13 +26,13 @@ export default class WoodBox{
     _initBody(params){
         const {world,size,position,physicsMaterial}=params;
 
-        const {x,z}=position;
+        const {x,y,z}=position;
 
         const boxShape=new CANNON.Box(new CANNON.Vec3(0.5*size,0.5*size,0.5*size));
-        const boxBody=new CANNON.Body({mass: 5, material: physicsMaterial});
+        const boxBody=new CANNON.Body({mass: 5*Math.pow(size,3), material: physicsMaterial});
 
         boxBody.addShape(boxShape);
-        boxBody.position.set(x,0.5*size,z);
+        boxBody.position.set(x,0.5*size+y,z);
         boxBody.linearDamping=0.9;
 
         world.addBody(boxBody);

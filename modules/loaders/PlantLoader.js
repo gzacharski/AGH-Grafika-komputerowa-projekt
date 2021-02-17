@@ -38,6 +38,8 @@ export default class PlantLoader{
                     texture.premultiplyAlpha=true;
                     texture.format=THREE.RGBAFormat;
                     texture.anisotropy=16;
+                    texture.wrapS=THREE.RepeatWrapping;
+                    texture.wrapT=THREE.RepeatWrapping;
 
                     material.map=texture;
                     material.transparent=true;
@@ -47,7 +49,9 @@ export default class PlantLoader{
             }
         });
 
-        resolve(model);
+        const meshes=model.children.filter(child=>child.isMesh);
+        
+        resolve(meshes);
     }
 
     _onError=(reject)=>{
