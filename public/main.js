@@ -13,6 +13,7 @@ import { AfterimagePass } from './jsm/postprocessing/AfterimagePass.js';
 const clock = new THREE.Clock();
 clock.start();
 let stats;
+let canPlay=false;
 
 //three.js variables
 let scene, camera, renderer, material, gameplayCamera;
@@ -100,7 +101,6 @@ function initThree(){
 
     const floor = new THREE.Mesh(floorGeometry, material)
     floor.receiveShadow = true;
-    console.log(floor);
     scene.add(floor)
 
     window.addEventListener('resize', () => {
@@ -143,7 +143,6 @@ function initCannon(){
     const groundBody=new CANNON.Body({mass: 0, material: physicsMaterial})
     groundBody.addShape(groundShape);
     groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
-    console.log(groundBody);
     world.addBody(groundBody);
 }
 
@@ -151,7 +150,6 @@ function initCharacter(){
     character=new Character('ninja',physicsMaterial);
     
     character.getCharacter().then(theCharacter=>{
-            console.log(theCharacter);
             character._character=theCharacter;
             character._character.body.position.set(0,1,15);
             scene.add(character._character.model);
@@ -165,7 +163,6 @@ function initMagician(){
     magician=new Magician('magician',physicsMaterial);
 
     magician.getCharacter().then(theMagician=>{
-            console.log(theMagician);
             magician._character=theMagician;
             magician._character.body.position.set(3,1,-5);
             magician._character.model.rotation.y=0;
@@ -250,6 +247,8 @@ function animate() {
         if(magician.castSpell) composer.render();
     }
 
+    if(!canPlay && character.status && magician.status) showStartupWindow();
+
     gameplayCamera.update();
     world.step(1/60);
 };
@@ -260,4 +259,25 @@ function addPostprocessing(){
 
     const afterimagePass = new AfterimagePass();
     composer.addPass( afterimagePass );
+}
+
+function showStartupWindow(){
+    
+    const logs=document.getElementById('logs');
+    if(logs) logs.remove();
+
+    const rendering=document.getElementById('rendering');
+    rendering.style.display='block';
+
+    setTimeout(()=>{
+        rendering.remove();
+
+        const root=document.getElementById('root');
+        root.style.backgroundColor= 'rgba(0, 0, 0, 0.5)';
+
+        const instructions=document.getElementById('instructions');
+        instructions.style.display='block';
+        instructions.style.transition = "all 2s";
+        canPlay=true;
+    },5000);
 }
