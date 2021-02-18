@@ -128,7 +128,7 @@ function initCannon(){
     physicsMaterial = new CANNON.Material('physics')
     const physics_physics = new CANNON.ContactMaterial(physicsMaterial, physicsMaterial, {
       friction: 0.1,
-      restitution: 0.3,
+      restitution: 0.1,
     })
 
     world.addContactMaterial(physics_physics);
