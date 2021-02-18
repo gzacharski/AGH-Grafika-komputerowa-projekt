@@ -4,8 +4,8 @@ Projekt z przedmiotu Wstęp do grafiki komputerowej (AGH, WIET, 2020/2021). Proj
 ## Uczestnicy
 1. Grzegorz Zacharski (gzacharski@student.agh.edu.pl)
 
-## Dokumentacja
-Dokumentacja w opracowaniu [Wiki](#link).
+## Prezentacja
+Film prezentujący aplikację dostępny pod [linkiem](https://www.youtube.com/watch?v=Hd4qvRFBTZA&feature=youtu.be&ab_channel=GrzegorzZacharski).
 
 ## Technologie
 * Front-end: Javascipt, Three.js, Cannon.js, Mixamo
