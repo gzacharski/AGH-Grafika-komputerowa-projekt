@@ -16,21 +16,26 @@ export default class Forest{
             { x: -15, y: 0, z: -15, rotation: -Math.PI, scale: 1.0 , radius: 5},
             { x: -15, y: 0, z: 15, rotation: Math.PI / 2, scale: 1.5 , radius: 8},
             { x: 15, y: 0, z: -15, rotation: Math.PI / 2, scale: 1.2 , radius: 9},
-            { x: 0, y: 0, z: 20, rotation: Math.PI, scale: 0.75 , radius: 6},
-            { x: 0, y: 0, z: -20, rotation: -Math.PI, scale: 1.75 , radius: 5},
-            { x: -20, y: 0, z: 0, rotation: Math.PI / 2, scale: 1.5 , radius: 8},
-            { x: 20, y: 0, z: 0, rotation: Math.PI / 2, scale: 1.2 , radius: 9},
+            // { x: 0, y: 0, z: 20, rotation: Math.PI, scale: 0.75 , radius: 6},
+            // { x: 0, y: 0, z: -20, rotation: -Math.PI, scale: 1.75 , radius: 5},
+            // { x: -20, y: 0, z: 0, rotation: Math.PI / 2, scale: 1.5 , radius: 8},
+            // { x: 20, y: 0, z: 0, rotation: Math.PI / 2, scale: 1.2 , radius: 9},
         ];
     
         let conifersTreePositions=[
-            { x: 30, y: 0, z: 30, rotation: Math.PI, scale: 1.2 , radius: 7},
+            { x: 30, y: 0, z: 30, rotation: Math.PI, scale: 2.2 , radius: 7},
             { x: -30, y: 0, z: 30, rotation: Math.PI / 2, scale: 3 , radius: 8},
-            { x: 30, y: 0, z: -30, rotation: Math.PI / 2, scale: 1.3 , radius: 6},
-            { x: -30, y: 0, z: -30, rotation: Math.PI / 2, scale: 1.5 , radius: 9},
-            { x: 30, y: 0, z: 0, rotation: Math.PI, scale: 1.2 , radius: 10},
+            { x: 30, y: 0, z: -30, rotation: Math.PI / 2, scale: 2.3 , radius: 6},
+            { x: -30, y: 0, z: -30, rotation: Math.PI / 2, scale: 1.75 , radius: 9},
+            { x: 30, y: 0, z: 0, rotation: Math.PI, scale: 1.9 , radius: 10},
             { x: 0, y: 0, z: 30, rotation: Math.PI / 2, scale: 3 , radius: 9},
-            { x: 0, y: 0, z: -30, rotation: Math.PI / 2, scale: 1.3 , radius: 8},
-            { x: -30, y: 0, z: 0, rotation: Math.PI / 2, scale: 1.5 , radius: 7},
+            { x: 0, y: 0, z: -30, rotation: Math.PI / 2, scale: 2.3 , radius: 8},
+            { x: -30, y: 0, z: 0, rotation: Math.PI / 2, scale: 2.5 , radius: 7},
+
+            // { x: 0, y: 0, z: 20, rotation: Math.PI, scale: 0.75 , radius: 6},
+            // { x: 0, y: 0, z: -20, rotation: -Math.PI, scale: 1.75 , radius: 5},
+            // { x: -20, y: 0, z: 0, rotation: Math.PI / 2, scale: 1.5 , radius: 8},
+            // { x: 20, y: 0, z: 0, rotation: Math.PI / 2, scale: 1.2 , radius: 9},
         ];
         
         deciduousTreesPositions.forEach(tree=>{

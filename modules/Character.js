@@ -87,7 +87,7 @@ export default class Character{
     _initBody(physicsMaterial){
         const size=new CANNON.Vec3(bodySize,bodySize,bodySize)
         const shape=new CANNON.Box(size);
-        const body=new CANNON.Body({mass: 1000, material: physicsMaterial});
+        const body=new CANNON.Body({mass: 500, material: physicsMaterial});
 
         body.position.set(0,bodySize,0);
         body.addShape(shape);

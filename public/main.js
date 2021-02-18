@@ -5,6 +5,10 @@ import Character from '/modules/Character.js';
 import GameplayCamera from '/modules/GameplayCamera.js';
 import WoodBox from '/modules/WoodBox.js';
 import Forest from '/modules/Forest.js';
+import Magician from '/modules/Magician.js';
+import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+import { AfterimagePass } from './jsm/postprocessing/AfterimagePass.js';
 
 const clock = new THREE.Clock();
 clock.start();
@@ -16,28 +20,29 @@ let scene, camera, renderer, material, gameplayCamera;
 //cannon.js variables
 let world, physicsMaterial, woodBoxes;
 
-let tree;
+//postprocessing
+let composer;
 
 //models
-let character={status:false};
+let character={status:false},magician={status:false} ;
 
 const root=document.getElementById('root');
 document.addEventListener('click', () => {
     root.style.display = 'none';
     character._input.disabled=false;
-
-    console.log(character._character.body);
-    console.log(character._character.model);
+    magician._canPlayAnimation=true;
 });
 
 initThree();
-axesHelper();
+//axesHelper();
 initCannon();
 initCharacter();
+initMagician();
 initGameplayCamera();
 addSkyBox();
 initPlants();
 addWoodBox();
+addPostprocessing();
 animate();
 
 function initThree(){
@@ -148,9 +153,25 @@ function initCharacter(){
     character.getCharacter().then(theCharacter=>{
             console.log(theCharacter);
             character._character=theCharacter;
+            character._character.body.position.set(0,1,15);
             scene.add(character._character.model);
             world.addBody(character._character.body);
             character.status=true;
+        })
+        .catch(error=>console.log(error));
+}
+
+function initMagician(){
+    magician=new Magician('magician',physicsMaterial);
+
+    magician.getCharacter().then(theMagician=>{
+            console.log(theMagician);
+            magician._character=theMagician;
+            magician._character.body.position.set(3,1,-5);
+            magician._character.model.rotation.y=0;
+            scene.add(magician._character.model);
+            world.addBody(magician._character.body);
+            magician.status=true;
         })
         .catch(error=>console.log(error));
 }
@@ -224,7 +245,19 @@ function animate() {
         woodBoxes.forEach(box=>box.update());
     } 
 
+    if(magician.status) {
+        magician.update(delta);
+        if(magician.castSpell) composer.render();
+    }
+
     gameplayCamera.update();
     world.step(1/60);
-    
 };
+
+function addPostprocessing(){
+    composer = new EffectComposer( renderer );
+    composer.addPass( new RenderPass( scene, camera ) );
+
+    const afterimagePass = new AfterimagePass();
+    composer.addPass( afterimagePass );
+}
