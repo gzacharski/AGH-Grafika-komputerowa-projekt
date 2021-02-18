@@ -1,4 +1,5 @@
 import { FBXLoader } from '/jsm/loaders/FBXLoader';
+import log from '/modules/Logger.js';
 
 export default class CharacterLoader{
     constructor(fileName){
@@ -18,7 +19,7 @@ export default class CharacterLoader{
     }
 
     _onLoading=(model)=>{
-        console.log(`Model ${(model.loaded/model.total*100).toFixed(0)}% loaded...`);
+        log(`Model ${(model.loaded/model.total*100).toFixed(0)}% loaded...`);
     }
 
     _afterLoaded=(model,resolve)=>{
@@ -40,7 +41,7 @@ export default class CharacterLoader{
     }
 
     _onFinally=()=>{
-        console.log("Loading finished.");
+        log("Character loading finished.");
     }
 
     getCharacter(){

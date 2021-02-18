@@ -1,4 +1,5 @@
 import { FBXLoader } from '/jsm/loaders/FBXLoader';
+import log from '/modules/Logger.js';
 
 export default class AnimationLoader {
     constructor(animationArray){
@@ -27,7 +28,7 @@ export default class AnimationLoader {
     }
 
     _onLoading=(animation,name)=>{
-        console.log(`Animation ${name} loaded ${(animation.loaded/animation.total*100).toFixed(0)}%...`);
+        log(`Animation ${name} loaded ${(animation.loaded/animation.total*100).toFixed(0)}%...`);
     }
 
     _afterLoaded=(animation,name,resolve)=>{
@@ -40,7 +41,7 @@ export default class AnimationLoader {
     }
 
     _onFinally=()=>{
-        console.log("Animation loading finished.");
+        log("Animation loading finished.");
     }
 
     getAnimations(){

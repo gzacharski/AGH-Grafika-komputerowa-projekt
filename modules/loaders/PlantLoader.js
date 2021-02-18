@@ -1,5 +1,6 @@
 import { FBXLoader } from '/jsm/loaders/FBXLoader';
 import * as THREE from '/build/three.module.js';
+import log from '/modules/Logger.js';
 
 export default class PlantLoader{
     constructor(filename){
@@ -19,7 +20,7 @@ export default class PlantLoader{
     }
 
     _onLoading=(model)=>{
-        console.log(`Model ${(model.loaded/model.total*100).toFixed(0)}% loaded...`);
+        log(`Model ${(model.loaded/model.total*100).toFixed(0)}% loaded...`);
     }
 
     _afterLoaded=(model,resolve)=>{
@@ -59,7 +60,7 @@ export default class PlantLoader{
     }
 
     _onFinally=()=>{
-        console.log("Loading finished.");
+        log("Plant loading finished.");
     }
 
     getPlant(){
