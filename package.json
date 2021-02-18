@@ -16,5 +16,9 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gzacharski/AGH-Grafika-komputerowa-projekt.git"
   }
 }
