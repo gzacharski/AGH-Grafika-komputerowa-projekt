@@ -29,9 +29,11 @@ let character={status:false},magician={status:false} ;
 
 const root=document.getElementById('root');
 document.addEventListener('click', () => {
-    root.style.display = 'none';
-    character._input.disabled=false;
-    magician._canPlayAnimation=true;
+    if(canPlay){
+        root.style.display = 'none';
+        character._input.disabled=false;
+        magician._canPlayAnimation=true;
+    }
 });
 
 initThree();
