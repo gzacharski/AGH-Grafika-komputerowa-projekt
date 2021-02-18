@@ -1,8 +1,8 @@
 # Wstęp do grafiki komputerowej - projekt
-Celem projektu jest zaimplementowanie systemu realizującego wybrane podstawowe operacje w przykładowej bazie Northwind w wybranej technologii.
+Projekt z przedmiotu Wstęp do grafiki komputerowej (AGH, WIET, 2020/2021). Projekt przedstawia prostą scenę w której możemy się poruszać postacią za pomocą klawiatury.  
 
 ## Uczestnicy
-3. Grzegorz Zacharski (gzacharski@student.agh.edu.pl)
+1. Grzegorz Zacharski (gzacharski@student.agh.edu.pl)
 
 ## Dokumentacja
 Dokumentacja w opracowaniu [Wiki](#link).
@@ -12,7 +12,7 @@ Dokumentacja w opracowaniu [Wiki](#link).
 * Back-end: Node.js oraz Express.js (REST API)
 * Konteneryzacja: Docker
 
-## Uruchamianie i Zamykanie
+## Uruchamianie i zamykanie
 1. Do uruchomienia potrzebny jest Docker.
 1. Wystartowanie w kontenerze Dockerowym:
    ```shell script
